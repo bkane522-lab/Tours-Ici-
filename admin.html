@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0E2233" />
+  <title>Espace terrain — Tours Ici</title>
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+  <main class="admin-shell">
+    <header>
+      <a href="index.html">← Retour à Tours Ici</a>
+      <p>ESPACE TERRAIN</p>
+      <h1>Ajouter une adresse rencontrée</h1>
+      <span>Cette première version enregistre les fiches uniquement sur l’appareil utilisé.</span>
+    </header>
+
+    <section class="consent-note">
+      <strong>Avant les photos</strong>
+      <p>Demandez l’autorisation du responsable. Évitez les clients reconnaissables sans accord.</p>
+    </section>
+
+    <form id="placeForm">
+      <div class="field full">
+        <label for="name">Nom de l’établissement *</label>
+        <input id="name" name="name" required placeholder="Ex. Le Café du Centre" />
+      </div>
+
+      <div class="field">
+        <label for="category">Catégorie *</label>
+        <select id="category" name="category" required>
+          <option value="restaurant">Restaurant</option>
+          <option value="bar">Bar</option>
+          <option value="kebab">Kebab</option>
+          <option value="pub">Pub</option>
+          <option value="nightclub">Discothèque</option>
+          <option value="cafe">Café</option>
+          <option value="culture">Culture / Musée</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="district">Quartier</label>
+        <input id="district" name="district" placeholder="Vieux-Tours" />
+      </div>
+
+      <div class="field full">
+        <label for="address">Adresse *</label>
+        <input id="address" name="address" required placeholder="Adresse complète à Tours" />
+      </div>
+
+      <div class="field">
+        <label for="lat">Latitude *</label>
+        <input id="lat" name="lat" required inputmode="decimal" placeholder="47.394" />
+      </div>
+
+      <div class="field">
+        <label for="lng">Longitude *</label>
+        <input id="lng" name="lng" required inputmode="decimal" placeholder="0.685" />
+      </div>
+
+      <button id="useLocationBtn" class="secondary full" type="button">◎ Utiliser ma position actuelle</button>
+
+      <div class="field">
+        <label for="open">Ouverture</label>
+        <input id="open" name="open" type="time" value="10:00" />
+      </div>
+
+      <div class="field">
+        <label for="close">Fermeture</label>
+        <input id="close" name="close" type="time" value="22:00" />
+      </div>
+
+      <div class="field">
+        <label for="price">Budget</label>
+        <select id="price" name="price">
+          <option value="€">€ — Petit budget</option>
+          <option value="€€" selected>€€ — Moyen</option>
+          <option value="€€€">€€€ — Plus élevé</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="phone">Téléphone</label>
+        <input id="phone" name="phone" inputmode="tel" placeholder="02…" />
+      </div>
+
+      <div class="field full">
+        <label for="website">Site ou réseau social</label>
+        <input id="website" name="website" inputmode="url" placeholder="https://…" />
+      </div>
+
+      <div class="field full">
+        <label for="description">Ce qui rend ce lieu spécial *</label>
+        <textarea id="description" name="description" required rows="4" placeholder="Ambiance, spécialité, accueil, particularité…"></textarea>
+      </div>
+
+      <div class="field full">
+        <label for="tags">Mots-clés</label>
+        <input id="tags" name="tags" placeholder="Terrasse, familial, cocktails" />
+        <small>Séparez les mots par des virgules.</small>
+      </div>
+
+      <div class="field full checkbox-field">
+        <input id="verified" name="verified" type="checkbox" />
+        <label for="verified">J’ai rencontré le responsable et vérifié les informations.</label>
+      </div>
+
+      <div class="field full">
+        <label for="photos">Photos prises sur place</label>
+        <input id="photos" name="photos" type="file" accept="image/*" multiple capture="environment" />
+        <small>La première photo sera redimensionnée et enregistrée comme photo principale sur ce téléphone.</small>
+        <div id="photoPreview" class="photo-preview"></div>
+      </div>
+
+      <button class="primary full" type="submit">Enregistrer la fiche</button>
+    </form>
+
+    <section class="saved-section">
+      <div>
+        <p>FICHES AJOUTÉES SUR CE TÉLÉPHONE</p>
+        <h2 id="savedCount">0 adresse</h2>
+      </div>
+      <div id="savedPlaces"></div>
+    </section>
+  </main>
+
+  <dialog id="successDialog">
+    <h2>Adresse enregistrée 🔥</h2>
+    <p>Elle apparaît maintenant dans Tours Ici sur cet appareil.</p>
+    <div>
+      <a href="index.html">Voir dans l’application</a>
+      <button id="addAnotherBtn" type="button">Ajouter une autre</button>
+    </div>
+  </dialog>
+
+  <script src="admin.js"></script>
+</body>
+</html>

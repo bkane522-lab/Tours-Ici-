@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0E2233" />
+  <meta name="description" content="Tours Ici — Découvrez où manger, boire, sortir et visiter à Tours." />
+  <title>Tours Ici</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://unpkg.com" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero">
+      <div class="hero-top">
+        <a class="brand" href="#" aria-label="Accueil Tours Ici">
+          <span class="brand-pin" aria-hidden="true">
+            <span class="brand-pin-dot"></span>
+          </span>
+          <span class="brand-text">
+            <strong>TOURS</strong>
+            <em>ICI</em>
+          </span>
+        </a>
+        <button id="installBtn" class="icon-button install-button" type="button" hidden aria-label="Installer l'application">＋</button>
+      </div>
+
+      <div class="hero-copy">
+        <p class="eyebrow">LE GUIDE LOCAL QUI VA SUR PLACE</p>
+        <h1>Manger, boire, sortir<br />et découvrir Tours.</h1>
+        <p>Des adresses rencontrées, photographiées et vérifiées humainement.</p>
+      </div>
+
+      <div class="search-box">
+        <span aria-hidden="true">⌕</span>
+        <input id="searchInput" type="search" autocomplete="off" placeholder="Nom, quartier, ambiance…" aria-label="Rechercher un lieu" />
+        <button id="clearSearch" type="button" aria-label="Effacer la recherche" hidden>×</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="filters-section" aria-labelledby="filterTitle">
+        <div class="section-heading compact">
+          <div>
+            <p class="section-kicker">ENVIE DU MOMENT</p>
+            <h2 id="filterTitle">Où allez-vous aujourd’hui ?</h2>
+          </div>
+          <button id="nearMeBtn" class="near-me" type="button">◎ Autour de moi</button>
+        </div>
+
+        <div id="categoryFilters" class="category-grid" role="group" aria-label="Filtres par catégorie"></div>
+
+        <div class="quick-filters">
+          <button id="openNowBtn" class="quick-chip" type="button" aria-pressed="false">Ouvert maintenant</button>
+          <button id="verifiedBtn" class="quick-chip" type="button" aria-pressed="false">✓ Vérifié sur place</button>
+          <button id="favoritesBtn" class="quick-chip" type="button" aria-pressed="false">♡ Mes favoris</button>
+        </div>
+      </section>
+
+      <section class="view-section">
+        <div class="view-toolbar">
+          <div>
+            <p class="section-kicker">SÉLECTION TOURS ICI</p>
+            <h2><span id="resultCount">0</span> adresses</h2>
+          </div>
+          <div class="segmented" role="group" aria-label="Choisir la vue">
+            <button id="listViewBtn" class="active" type="button" aria-pressed="true">Liste</button>
+            <button id="mapViewBtn" type="button" aria-pressed="false">Carte</button>
+          </div>
+        </div>
+
+        <div id="emptyState" class="empty-state" hidden>
+          <div>⌕</div>
+          <h3>Aucune adresse trouvée</h3>
+          <p>Essayez une autre catégorie ou effacez la recherche.</p>
+          <button id="resetFiltersBtn" type="button">Tout afficher</button>
+        </div>
+
+        <div id="placesList" class="places-list"></div>
+        <div id="mapPanel" class="map-panel" hidden>
+          <div id="map" aria-label="Carte des adresses Tours Ici"></div>
+          <div class="map-legend">Touchez un marqueur pour voir l’adresse.</div>
+        </div>
+      </section>
+
+      <section class="field-card">
+        <div class="field-visual" aria-hidden="true">
+          <span>📷</span>
+        </div>
+        <div>
+          <p class="section-kicker">TOURS ICI VA SUR PLACE</p>
+          <h2>Une adresse manque ?</h2>
+          <p>Ajoutez un établissement, ses informations et vos propres photos depuis l’espace terrain.</p>
+          <a class="primary-link" href="admin.html">Ouvrir l’espace terrain →</a>
+        </div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Navigation principale">
+      <button class="nav-item active" data-action="home" type="button">
+        <span>⌂</span><small>Accueil</small>
+      </button>
+      <button class="nav-item" data-action="map" type="button">
+        <span>⌖</span><small>Carte</small>
+      </button>
+      <button class="nav-item" data-action="favorites" type="button">
+        <span>♡</span><small>Favoris</small>
+      </button>
+      <a class="nav-item" href="admin.html">
+        <span>＋</span><small>Ajouter</small>
+      </a>
+    </nav>
+  </div>
+
+  <dialog id="placeDialog" class="place-dialog">
+    <button id="closeDialogBtn" class="dialog-close" type="button" aria-label="Fermer">×</button>
+    <div id="dialogContent"></div>
+  </dialog>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="places.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
