@@ -1,4 +1,4 @@
-# Tours Ici — première base mobile
+# Tours Ici — édition premium mobile
 
 Application locale PWA pour découvrir où manger, boire, sortir et visiter à Tours.
 
@@ -34,3 +34,27 @@ elles restent sur l’appareil et le navigateur utilisés. Pour une vraie public
 il faudra ensuite connecter une base en ligne, par exemple Supabase.
 
 La première photo choisie dans l’espace terrain est compressée et enregistrée dans la fiche locale. Pour un catalogue important et une synchronisation entre appareils, une base en ligne restera nécessaire.
+
+
+## Nouveautés premium
+- accueil nocturne inspiré des visuels fournis
+- icônes fines homogènes
+- filtres rapides entièrement visibles
+- fiches allégées
+- carte nocturne
+- aucun badge « vérifié » sur les fiches de démonstration
+
+
+## Consolidation finale royale — 27/07/2026
+
+- corrections techniques issues de l’audit Claude conservées ;
+- téléphone et site affichés dans la fiche détaillée ;
+- erreur de quota localStorage gérée ;
+- icône maskable séparée ;
+- identité officielle Tours Ici intégrée ;
+- icône PWA gold royal / bleu royal plus visible ;
+- favicon et Apple Touch ajoutés ;
+- image Open Graph ajoutée ;
+- visuel principal recompressé ;
+- ressources tierces Leaflet/OSM exclues du cache applicatif ;
+- cache renouvelé.

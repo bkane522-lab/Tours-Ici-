@@ -1,7 +1,10 @@
 :root {
-  --night: #0e2233;
-  --night-soft: #19394a;
-  --cream: #fff9f2;
+  --night: #07182d;
+  --night-soft: #143176;
+  --royal: #143176;
+  --gold: #ead8a7;
+  --gold-light: #f6eac8;
+  --cream: #fbf6e8;
   --paper: #ffffff;
   --ink: #17212b;
   --muted: #6f7d86;
@@ -23,7 +26,7 @@
 html { scroll-behavior: smooth; }
 body {
   margin: 0;
-  background: #ebe7e1;
+  background: #e8e2d5;
   color: var(--ink);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
@@ -50,9 +53,8 @@ a { color: inherit; text-decoration: none; }
   padding: 22px 20px 34px;
   color: white;
   background:
-    radial-gradient(circle at 80% 18%, rgba(245,182,66,.28), transparent 23%),
-    radial-gradient(circle at 15% 75%, rgba(21,157,153,.28), transparent 32%),
-    linear-gradient(145deg, #0d2030 0%, #173f50 55%, #1d5360 100%);
+    linear-gradient(180deg, rgba(4,18,28,.38), rgba(4,18,28,.88)),
+    url("assets/tours-hero.jpg") center 47% / cover no-repeat;
   border-radius: 0 0 38px 38px;
 }
 .hero::before,
@@ -79,24 +81,14 @@ a { color: inherit; text-decoration: none; }
   position: relative;
   z-index: 1;
 }
-.brand-pin {
-  width: 43px;
-  height: 50px;
-  border-radius: 50% 50% 50% 8px;
-  transform: rotate(-45deg);
-  display: grid;
-  place-items: center;
-  background: linear-gradient(135deg, var(--coral), #ff9984);
-  box-shadow: 0 12px 28px rgba(239,111,97,.3);
+.brand-mark {
+  width: 44px;
+  height: 54px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,.22));
   animation: breathe 3.6s ease-in-out infinite;
 }
-.brand-pin-dot {
-  width: 15px;
-  height: 15px;
-  border-radius: 50%;
-  background: var(--cream);
-}
-.brand-text { display: grid; line-height: .9; letter-spacing: .14em; }
+.brand-text { display: grid; line-height: .9; letter-spacing: .14em; color: var(--gold-light); }
 .brand-text strong { font-size: 15px; font-weight: 500; }
 .brand-text em { font-size: 23px; font-style: normal; font-weight: 900; letter-spacing: .23em; }
 
@@ -116,9 +108,9 @@ a { color: inherit; text-decoration: none; }
   font-size: 10px;
   font-weight: 900;
   letter-spacing: .18em;
-  color: var(--coral);
+  color: var(--royal);
 }
-.hero-copy .eyebrow { color: #ffd2c8; }
+.hero-copy .eyebrow { color: var(--gold-light); }
 .hero-copy h1 {
   margin: 0;
   max-width: 560px;
@@ -169,7 +161,7 @@ main { padding: 6px 16px 24px; }
   padding: 20px;
   border: 1px solid rgba(23,33,43,.06);
   border-radius: var(--radius-xl);
-  background: rgba(255,255,255,.78);
+  background: rgba(255,255,255,.82);
   box-shadow: var(--soft-shadow);
 }
 .section-heading.compact { align-items: flex-end; }
@@ -209,7 +201,17 @@ main { padding: 6px 16px 24px; }
   transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
 }
 .category-chip:active { transform: scale(.97); }
-.category-chip .cat-icon { font-size: 21px; line-height: 1; }
+.category-chip .cat-icon {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+}
+.category-chip .cat-icon img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
 .category-chip .cat-label { font-size: 10.5px; font-weight: 900; line-height: 1.05; }
 .category-chip.active {
   color: white;
@@ -218,15 +220,13 @@ main { padding: 6px 16px 24px; }
   box-shadow: 0 10px 20px color-mix(in srgb, var(--cat) 28%, transparent);
 }
 .quick-filters {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
   gap: 8px;
-  overflow-x: auto;
   margin-top: 13px;
-  scrollbar-width: none;
 }
-.quick-filters::-webkit-scrollbar { display: none; }
 .quick-chip {
-  flex: 0 0 auto;
+  min-width: 0;
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 9px 12px;
@@ -345,14 +345,27 @@ main { padding: 6px 16px 24px; }
 .place-actions { display: flex; align-items: center; gap: 7px; margin-top: 10px; }
 .place-actions button, .place-actions a {
   border: 0;
-  border-radius: 10px;
-  padding: 8px 9px;
+  border-radius: 11px;
+  min-height: 34px;
+  padding: 8px 10px;
   background: #edf5f4;
   color: var(--night);
-  font-size: 9.5px;
+  font-size: 10px;
   font-weight: 900;
 }
-.place-actions .details-btn { background: var(--night); color: white; }
+.place-actions .details-btn {
+  flex: 1 1 auto;
+  background: var(--night);
+  color: white;
+}
+.place-actions .route-btn,
+.place-actions .share-btn {
+  width: 36px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+}
 
 .map-panel { position: relative; padding: 0 12px 16px; }
 #map { height: 520px; border-radius: 22px; overflow: hidden; }
@@ -440,7 +453,7 @@ main { padding: 6px 16px 24px; }
 }
 .nav-item span { font-size: 20px; }
 .nav-item small { font-size: 9px; font-weight: 900; }
-.nav-item.active { color: var(--coral); }
+.nav-item.active { color: var(--royal); }
 
 .place-dialog {
   width: min(calc(100% - 24px), 640px);
@@ -497,6 +510,15 @@ main { padding: 6px 16px 24px; }
 .info-box { padding: 13px; border-radius: 15px; background: white; }
 .info-box small { display: block; color: var(--muted); font-size: 9px; font-weight: 900; letter-spacing: .1em; }
 .info-box strong { display: block; margin-top: 4px; font-size: 12px; }
+.contact-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 18px; }
+.contact-chip {
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: #edf5f4;
+  color: var(--night);
+  font-size: 12px;
+  font-weight: 800;
+}
 .dialog-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
 .dialog-actions a, .dialog-actions button {
   border: 0;
@@ -528,4 +550,26 @@ main { padding: 6px 16px 24px; }
   main { padding-left: 24px; padding-right: 24px; }
   .places-list { grid-template-columns: 1fr 1fr; }
   .place-card { grid-template-columns: 105px 1fr; }
+}
+
+.leaflet-tile-pane {
+  filter: brightness(.55) saturate(.75) contrast(1.1) hue-rotate(155deg);
+}
+.place-cover-icon img,
+.dialog-hero-icon img {
+  width: 42px;
+  height: 42px;
+  filter: brightness(0) invert(1);
+}
+.dialog-hero-icon img {
+  width: 64px;
+  height: 64px;
+}
+.custom-marker span img {
+  width: 15px;
+  height: 15px;
+  filter: brightness(0) invert(1);
+}
+@media (max-width: 390px) {
+  .quick-chip { font-size: 9.5px; padding-inline: 7px; }
 }

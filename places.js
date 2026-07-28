@@ -1,12 +1,12 @@
 window.TOURS_ICI_CATEGORIES = [
-  { id: "all", label: "Tout", icon: "✦", color: "#0E2233", dark: "#0E2233" },
-  { id: "restaurant", label: "Restaurants", icon: "🍽️", color: "#EF6F61", dark: "#9F3F35" },
-  { id: "bar", label: "Bars", icon: "🍸", color: "#159D99", dark: "#0D706D" },
-  { id: "kebab", label: "Kebabs", icon: "🥙", color: "#E58B45", dark: "#975321" },
-  { id: "pub", label: "Pubs", icon: "🍺", color: "#6F9D88", dark: "#416B58" },
-  { id: "nightclub", label: "Discothèques", icon: "🪩", color: "#865D91", dark: "#583663" },
-  { id: "cafe", label: "Cafés", icon: "☕", color: "#B77A5C", dark: "#754732" },
-  { id: "culture", label: "Culture", icon: "🏛️", color: "#3F75A2", dark: "#285171" }
+  { id: "all", label: "Tout", icon: "assets/icon-all.svg", color: "#0E2233", dark: "#0E2233" },
+  { id: "restaurant", label: "Restaurants", icon: "assets/icon-restaurant.svg", color: "#F2765F", dark: "#9F3F35" },
+  { id: "bar", label: "Bars", icon: "assets/icon-bar.svg", color: "#1BB6BD", dark: "#0D7075" },
+  { id: "kebab", label: "Kebabs", icon: "assets/icon-kebab.svg", color: "#F39A3D", dark: "#975321" },
+  { id: "pub", label: "Pubs", icon: "assets/icon-pub.svg", color: "#4D9D82", dark: "#416B58" },
+  { id: "nightclub", label: "Discothèques", icon: "assets/icon-nightclub.svg", color: "#7E5E9B", dark: "#583663" },
+  { id: "cafe", label: "Cafés", icon: "assets/icon-cafe.svg", color: "#B37A62", dark: "#754732" },
+  { id: "culture", label: "Culture", icon: "assets/icon-culture.svg", color: "#3F78A8", dark: "#285171" }
 ];
 
 /*
@@ -27,7 +27,7 @@ window.TOURS_ICI_DEMO_PLACES = [
     price: "€€",
     phone: "",
     website: "",
-    verified: true,
+    verified: false,
     hours: { open: "12:00", close: "22:30" },
     colors: ["#EF6F61", "#F5B642"]
   },
@@ -44,7 +44,7 @@ window.TOURS_ICI_DEMO_PLACES = [
     price: "€€",
     phone: "",
     website: "",
-    verified: true,
+    verified: false,
     hours: { open: "17:00", close: "01:30" },
     colors: ["#159D99", "#3F75A2"]
   },
@@ -112,7 +112,7 @@ window.TOURS_ICI_DEMO_PLACES = [
     price: "€",
     phone: "",
     website: "",
-    verified: true,
+    verified: false,
     hours: { open: "08:00", close: "19:00" },
     colors: ["#B77A5C", "#F5B642"]
   },
@@ -129,7 +129,7 @@ window.TOURS_ICI_DEMO_PLACES = [
     price: "€",
     phone: "",
     website: "",
-    verified: true,
+    verified: false,
     hours: { open: "10:00", close: "18:00" },
     colors: ["#3F75A2", "#159D99"]
   }

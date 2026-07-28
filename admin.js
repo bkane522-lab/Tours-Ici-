@@ -9,6 +9,7 @@
   const savedCount = document.querySelector("#savedCount");
   const successDialog = document.querySelector("#successDialog");
   const addAnother = document.querySelector("#addAnotherBtn");
+  const saveError = document.querySelector("#saveError");
 
   function readPlaces() {
     try {
@@ -165,23 +166,36 @@
       return;
     }
 
-    const places = readPlaces();
-    places.unshift(place);
-    writePlaces(places);
-    renderSaved();
-    form.reset();
-    preview.innerHTML = "";
-    submitButton.disabled = false;
-    submitButton.textContent = "Enregistrer la fiche";
-    successDialog.showModal();
+    try {
+      const places = readPlaces();
+      places.unshift(place);
+      writePlaces(places);
+      renderSaved();
+      form.reset();
+      preview.innerHTML = "";
+      saveError.hidden = true;
+      successDialog.showModal();
+    } catch (error) {
+      console.warn(error);
+      saveError.hidden = false;
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = "Enregistrer la fiche";
+    }
   });
 
   savedPlaces.addEventListener("click", event => {
     const button = event.target.closest("[data-delete]");
     if (!button) return;
     const places = readPlaces().filter(place => place.id !== button.dataset.delete);
-    writePlaces(places);
-    renderSaved();
+    try {
+      writePlaces(places);
+      renderSaved();
+      saveError.hidden = true;
+    } catch (error) {
+      console.warn(error);
+      saveError.hidden = false;
+    }
   });
 
   addAnother.addEventListener("click", () => {

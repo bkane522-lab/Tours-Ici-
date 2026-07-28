@@ -3,11 +3,20 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#0E2233" />
+  <meta name="theme-color" content="#07182D" />
   <meta name="description" content="Tours Ici — Découvrez où manger, boire, sortir et visiter à Tours." />
   <title>Tours Ici</title>
   <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
+  <link rel="icon" href="assets/favicon.ico" sizes="any" />
+  <link rel="icon" href="assets/favicon-32.png" type="image/png" sizes="32x32" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta property="og:title" content="Tours Ici — Le guide local qui va sur place" />
+  <meta property="og:description" content="Manger, boire, sortir et découvrir Tours grâce à des adresses rencontrées et vérifiées humainement." />
+  <meta property="og:image" content="assets/og-tours-ici.png" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
   <link rel="preconnect" href="https://unpkg.com" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
   <link rel="stylesheet" href="style.css" />
@@ -17,9 +26,7 @@
     <header class="hero">
       <div class="hero-top">
         <a class="brand" href="#" aria-label="Accueil Tours Ici">
-          <span class="brand-pin" aria-hidden="true">
-            <span class="brand-pin-dot"></span>
-          </span>
+          <img class="brand-mark" src="assets/brand-mark.png" alt="" aria-hidden="true" />
           <span class="brand-text">
             <strong>TOURS</strong>
             <em>ICI</em>
@@ -36,7 +43,7 @@
 
       <div class="search-box">
         <span aria-hidden="true">⌕</span>
-        <input id="searchInput" type="search" autocomplete="off" placeholder="Nom, quartier, ambiance…" aria-label="Rechercher un lieu" />
+        <input id="searchInput" type="search" autocomplete="off" placeholder="Restaurant, bar, musée, quartier…" aria-label="Rechercher un lieu" />
         <button id="clearSearch" type="button" aria-label="Effacer la recherche" hidden>×</button>
       </div>
     </header>

@@ -153,7 +153,7 @@
         style="--cat:${category.color};--cat-dark:${category.dark}"
         aria-pressed="${state.category === category.id}"
       >
-        <span class="cat-icon" aria-hidden="true">${category.icon}</span>
+        <span class="cat-icon" aria-hidden="true"><img src="${category.icon}" alt="" /></span>
         <span class="cat-label">${escapeHtml(category.label)}</span>
       </button>
     `).join("");
@@ -172,7 +172,7 @@
       <article class="place-card" data-id="${escapeHtml(place.id)}">
         <button class="place-cover details-btn ${place.photo ? "has-photo" : ""}" type="button" style="--cover-a:${coverA};--cover-b:${coverB}" aria-label="Voir ${escapeHtml(place.name)}">
           ${place.photo ? `<img src="${place.photo}" alt="" loading="lazy" />` : ""}
-          <span class="place-cover-icon">${category.icon}</span>
+          <span class="place-cover-icon"><img src="${category.icon}" alt="" /></span>
           ${place.verified ? '<span class="verified-badge">✓ VÉRIFIÉ SUR PLACE</span>' : ""}
         </button>
         <div class="place-card-content">
@@ -181,7 +181,7 @@
               <p class="place-category">${escapeHtml(category.label)}</p>
               <h3>${escapeHtml(place.name)}</h3>
             </div>
-            <button class="favorite-button ${favorites.has(place.id) ? "active" : ""}" type="button" data-favorite="${escapeHtml(place.id)}" aria-label="Ajouter aux favoris">
+            <button class="favorite-button ${favorites.has(place.id) ? "active" : ""}" type="button" data-favorite="${escapeHtml(place.id)}" aria-label="${favorites.has(place.id) ? "Retirer des favoris" : "Ajouter aux favoris"}">
               ${favorites.has(place.id) ? "♥" : "♡"}
             </button>
           </div>
@@ -196,9 +196,9 @@
             ${(place.tags || []).slice(0, 3).map(tag => `<span>${escapeHtml(tag)}</span>`).join("")}
           </div>
           <div class="place-actions">
-            <button class="details-btn" type="button">Voir la fiche</button>
-            <a href="${mapsUrl(place)}" target="_blank" rel="noopener">Itinéraire</a>
-            <button class="share-btn" type="button">Partager</button>
+            <button class="details-btn" type="button">Voir</button>
+            <a class="route-btn" href="${mapsUrl(place)}" target="_blank" rel="noopener" aria-label="Itinéraire">⌖</a>
+            <button class="share-btn" type="button" aria-label="Partager">↗</button>
           </div>
         </div>
       </article>
@@ -216,6 +216,21 @@
     if (state.view === "map") {
       requestAnimationFrame(() => renderMap(places));
     }
+  }
+
+  function safeWebsiteUrl(value) {
+    const url = String(value || "").trim();
+    if (!/^https:\/\/|^http:\/\//i.test(url)) return "";
+    try {
+      const parsed = new URL(url);
+      return parsed.protocol === "http:" || parsed.protocol === "https:" ? parsed.href : "";
+    } catch {
+      return "";
+    }
+  }
+
+  function telHref(value) {
+    return String(value || "").replace(/[^0-9+]/g, "");
   }
 
   function mapsUrl(place) {
@@ -243,7 +258,7 @@
       const category = categoryById[place.category] || categoryById.all;
       const icon = L.divIcon({
         className: "",
-        html: `<div class="custom-marker" style="background:${category.color}"><span>${category.icon}</span></div>`,
+        html: `<div class="custom-marker" style="background:${category.color}"><span><img src="${category.icon}" alt="" /></span></div>`,
         iconSize: [36, 36],
         iconAnchor: [18, 36]
       });
@@ -332,10 +347,12 @@
     const category = categoryById[place.category] || categoryById.all;
     const [coverA, coverB] = place.colors || [category.color, category.dark];
     const open = isOpenNow(place);
+    const website = safeWebsiteUrl(place.website);
+    const hasContact = Boolean(place.phone) || Boolean(website);
 
     els.dialogContent.innerHTML = `
       <div class="dialog-hero ${place.photo ? "has-photo" : ""}" style="--cover-a:${coverA};--cover-b:${coverB};${place.photo ? `background-image:url('${place.photo}')` : ""}">
-        <span class="dialog-hero-icon">${category.icon}</span>
+        <span class="dialog-hero-icon"><img src="${category.icon}" alt="" /></span>
       </div>
       <div class="dialog-body">
         <p class="place-category">${escapeHtml(category.label)} ${place.verified ? "· ✓ Vérifié sur place" : ""}</p>
@@ -352,6 +369,12 @@
           <div class="info-box"><small>HORAIRES</small><strong>${escapeHtml(place.hours?.open || "—")} – ${escapeHtml(place.hours?.close || "—")}</strong></div>
           <div class="info-box"><small>BUDGET</small><strong>${escapeHtml(place.price || "Non indiqué")}</strong></div>
         </div>
+
+        ${hasContact ? `
+        <div class="contact-row">
+          ${place.phone ? `<a class="contact-chip" href="tel:${escapeHtml(telHref(place.phone))}">☎ ${escapeHtml(place.phone)}</a>` : ""}
+          ${website ? `<a class="contact-chip" href="${escapeHtml(website)}" target="_blank" rel="noopener noreferrer nofollow">↗ Site internet</a>` : ""}
+        </div>` : ""}
 
         <div class="dialog-actions">
           <a href="${mapsUrl(place)}" target="_blank" rel="noopener">Itinéraire</a>

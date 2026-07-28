@@ -29,6 +29,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--teal);box-shadow:0 0 
 small{color:var(--muted);font-size:10px;line-height:1.35}
 .checkbox-field{grid-template-columns:22px 1fr;align-items:start;padding:12px;border-radius:14px;background:#f3f7f6}
 .checkbox-field input{width:18px;height:18px}
+.save-error{grid-column:1/-1;margin:0;padding:12px 14px;border-radius:14px;background:#fff0ed;border:1px solid #ffd7d0;color:#a33f35;font-size:12px;line-height:1.45;font-weight:700}
 .primary,.secondary{border:0;border-radius:15px;padding:14px;font-weight:900}
 .primary{color:white;background:var(--coral)}
 .secondary{color:var(--night);background:#e6f3f1}
