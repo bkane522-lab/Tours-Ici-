@@ -274,7 +274,7 @@
     els.resultCount.textContent = String(places.length);
     els.resultCountLabel.textContent = places.length === 1 ? "adresse" : "adresses";
     els.list.innerHTML = places.map(placeCard).join("");
-    els.emptyState.hidden = places.length !== 0;
+    els.emptyState.hidden = state.view !== "list" || places.length !== 0;
     els.list.hidden = state.view !== "list" || places.length === 0;
     els.mapPanel.hidden = state.view !== "map";
 
@@ -369,7 +369,8 @@
     state.favoritesOnly = false;
     els.search.value = "";
     syncQuickButtons();
-    renderAll();
+    renderFilters();
+    setView("list");
   }
 
   function syncQuickButtons() {

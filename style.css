@@ -366,7 +366,7 @@ main { padding: 6px 16px 24px; }
 }
 
 .map-panel { position: relative; padding: 0 12px 16px; }
-#map { height: 520px; border-radius: 22px; overflow: hidden; }
+#map { height: 58vh; height: 58dvh; min-height: 340px; border-radius: 22px; overflow: hidden; }
 .map-legend {
   position: absolute;
   z-index: 500;
@@ -563,7 +563,9 @@ main { padding: 6px 16px 24px; }
   .hero { min-height: 230px; }
   .category-grid { gap: 6px; }
   .category-chip { min-height: 50px; }
-  .place-card { grid-template-columns: 105px 1fr; }
+  .place-card { grid-template-columns: 105px 1fr; align-items: start; min-height: 160px; }
+  .place-cover { width: 105px; height: 105px; min-height: 105px; align-self: start; }
+  .place-card-content { padding: 10px 12px 9px; }
   .place-actions { gap: 5px; }
   .place-actions button, .place-actions a { padding: 7px; font-size: 9px; }
 }
