@@ -49,24 +49,22 @@ a { color: inherit; text-decoration: none; }
 .hero {
   position: relative;
   overflow: hidden;
-  min-height: 370px;
-  padding: 22px 20px 34px;
+  min-height: 240px;
+  padding: 16px 20px 22px;
   color: white;
   background:
     linear-gradient(180deg, rgba(4,18,28,.38), rgba(4,18,28,.88)),
     url("assets/tours-hero.jpg") center 47% / cover no-repeat;
   border-radius: 0 0 38px 38px;
 }
-.hero::before,
-.hero::after {
+.hero::before {
   content: "";
   position: absolute;
   border-radius: 999px;
   border: 1px solid rgba(255,255,255,.12);
   pointer-events: none;
+  width: 190px; height: 190px; right: -85px; top: 46px;
 }
-.hero::before { width: 260px; height: 260px; right: -110px; top: 80px; }
-.hero::after { width: 160px; height: 160px; left: -75px; bottom: -45px; }
 
 .hero-top, .section-heading, .view-toolbar {
   display: flex;
@@ -102,7 +100,7 @@ a { color: inherit; text-decoration: none; }
   font-size: 25px;
   backdrop-filter: blur(12px);
 }
-.hero-copy { position: relative; z-index: 1; margin: 54px 0 24px; }
+.hero-copy { position: relative; z-index: 1; margin: 20px 0 16px; }
 .eyebrow, .section-kicker {
   margin: 0 0 7px;
   font-size: 10px;
@@ -114,16 +112,16 @@ a { color: inherit; text-decoration: none; }
 .hero-copy h1 {
   margin: 0;
   max-width: 560px;
-  font-size: clamp(30px, 8vw, 47px);
-  line-height: 1.03;
-  letter-spacing: -.04em;
+  font-size: clamp(24px, 6.5vw, 34px);
+  line-height: 1.05;
+  letter-spacing: -.03em;
 }
 .hero-copy p:last-child {
-  margin: 13px 0 0;
+  margin: 9px 0 0;
   max-width: 470px;
   color: rgba(255,255,255,.78);
-  line-height: 1.45;
-  font-size: 14px;
+  line-height: 1.4;
+  font-size: 13px;
 }
 .search-box {
   position: relative;
@@ -184,26 +182,26 @@ main { padding: 6px 16px 24px; }
 .category-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0,1fr));
-  gap: 9px;
-  margin-top: 18px;
+  gap: 6px;
+  margin-top: 10px;
 }
 .category-chip {
-  min-height: 68px;
-  padding: 10px 5px;
+  min-height: 50px;
+  padding: 6px 4px;
   border: 1px solid color-mix(in srgb, var(--cat) 25%, transparent);
-  border-radius: 17px;
+  border-radius: 15px;
   color: var(--cat-dark);
   background: color-mix(in srgb, var(--cat) 10%, white);
   display: grid;
   place-items: center;
-  gap: 5px;
+  gap: 3px;
   text-align: center;
   transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
 }
 .category-chip:active { transform: scale(.97); }
 .category-chip .cat-icon {
-  width: 26px;
-  height: 26px;
+  width: 20px;
+  height: 20px;
   display: grid;
   place-items: center;
 }
@@ -509,6 +507,27 @@ main { padding: 6px 16px 24px; }
 .detail-attributes { margin-top: 14px; }
 .detail-attributes small { display: block; color: var(--muted); font-size: 9px; font-weight: 900; letter-spacing: .1em; margin-bottom: 6px; }
 .detail-attributes .place-tags { margin-top: 0; }
+.more-info { margin: 14px 0 4px; }
+.more-info summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 12px 14px;
+  border-radius: 13px;
+  background: #f3f1ec;
+  color: var(--night);
+  font-size: 12px;
+  font-weight: 900;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+.more-info summary::-webkit-details-marker { display: none; }
+.more-info summary::after { content: "▾"; margin-left: auto; }
+.more-info[open] summary::after { content: "▴"; }
+.more-info[open] summary { border-radius: 13px 13px 0 0; }
+.more-info > *:not(summary) { margin-top: 0; }
+.more-info .info-grid:first-of-type,
+.more-info .detail-attributes:first-of-type { padding-top: 14px; }
 .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 18px 0; }
 .info-box { padding: 13px; border-radius: 15px; background: white; }
 .info-box small { display: block; color: var(--muted); font-size: 9px; font-weight: 900; letter-spacing: .1em; }
@@ -541,9 +560,9 @@ main { padding: 6px 16px 24px; }
 }
 
 @media (max-width: 420px) {
-  .hero { min-height: 380px; }
-  .category-grid { gap: 7px; }
-  .category-chip { min-height: 65px; }
+  .hero { min-height: 230px; }
+  .category-grid { gap: 6px; }
+  .category-chip { min-height: 50px; }
   .place-card { grid-template-columns: 105px 1fr; }
   .place-actions { gap: 5px; }
   .place-actions button, .place-actions a { padding: 7px; font-size: 9px; }

@@ -2,9 +2,12 @@
   "use strict";
 
   const PLACE_KEY = "toursIciCustomPlaces";
+  const DRAFT_KEY = "toursIciDraftPlace";
   const AUDIO_DB_NAME = "toursIciMedia";
   const AUDIO_STORE = "audioNotes";
   const MAX_RECORDING_SECONDS = 60;
+  const TOTAL_STEPS = 4;
+  const STEP_TITLES = ["Identité", "Ce qui le rend spécial", "Infos pratiques", "Photos et validation"];
 
   const form = document.querySelector("#placeForm");
   const preview = document.querySelector("#photoPreview");
@@ -14,6 +17,18 @@
   const successDialog = document.querySelector("#successDialog");
   const addAnother = document.querySelector("#addAnotherBtn");
   const saveError = document.querySelector("#saveError");
+
+  const wizardSteps = [...document.querySelectorAll(".wizard-step")];
+  const wizardStepLabel = document.querySelector("#wizardStepLabel");
+  const wizardDots = [...document.querySelectorAll(".wizard-dots span")];
+  const wizardBackBtn = document.querySelector("#wizardBackBtn");
+  const wizardNextBtn = document.querySelector("#wizardNextBtn");
+  const wizardSummary = document.querySelector("#wizardSummary");
+  const draftBanner = document.querySelector("#draftBanner");
+  const resumeDraftBtn = document.querySelector("#resumeDraftBtn");
+  const discardDraftBtn = document.querySelector("#discardDraftBtn");
+
+  let currentStep = 1;
 
   const recorderPanel = document.querySelector("#audioRecorderPanel");
   const toggleRecorder = document.querySelector("#toggleRecorderBtn");
@@ -78,6 +93,119 @@
   function selectedValues(name) {
     return [...form.querySelectorAll(`input[name="${name}"]:checked`)]
       .map(input => input.value);
+  }
+
+  function setSelectedValues(name, values) {
+    const wanted = new Set(values || []);
+    form.querySelectorAll(`input[name="${name}"]`).forEach(input => {
+      input.checked = wanted.has(input.value);
+    });
+  }
+
+  function collectDraftData() {
+    return {
+      step: currentStep,
+      name: form.name.value,
+      category: form.category.value,
+      district: form.district.value,
+      address: form.address.value,
+      services: selectedValues("services"),
+      cuisines: selectedValues("cuisines"),
+      description: description.value,
+      open: form.open.value,
+      close: form.close.value,
+      price: form.price.value,
+      phone: form.phone.value,
+      website: form.website.value,
+      tags: form.tags.value,
+      verified: form.verified.checked
+    };
+  }
+
+  function saveDraft() {
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(collectDraftData()));
+    } catch (error) {
+      console.warn(error);
+    }
+  }
+
+  function readDraft() {
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (error) {
+      console.warn(error);
+      return null;
+    }
+  }
+
+  function clearDraft() {
+    try {
+      localStorage.removeItem(DRAFT_KEY);
+    } catch (error) {
+      console.warn(error);
+    }
+  }
+
+  function draftHasContent(draft) {
+    return Boolean(draft && (draft.name || draft.address || draft.description));
+  }
+
+  function applyDraft(draft) {
+    form.name.value = draft.name || "";
+    form.category.value = draft.category || "restaurant";
+    form.district.value = draft.district || "";
+    form.address.value = draft.address || "";
+    setSelectedValues("services", draft.services);
+    setSelectedValues("cuisines", draft.cuisines);
+    description.value = draft.description || "";
+    form.open.value = draft.open || "10:00";
+    form.close.value = draft.close || "22:00";
+    form.price.value = draft.price || "€€";
+    form.phone.value = draft.phone || "";
+    form.website.value = draft.website || "";
+    form.tags.value = draft.tags || "";
+    form.verified.checked = Boolean(draft.verified);
+    goToStep(draft.step || 1);
+  }
+
+  function renderWizardSummary() {
+    const services = selectedValues("services");
+    const cuisines = selectedValues("cuisines");
+    const categoryLabel = form.category.selectedOptions[0]?.textContent || "";
+
+    wizardSummary.innerHTML = `
+      <p><strong>${escapeHtml(form.name.value || "Nom à compléter")}</strong> — ${escapeHtml(categoryLabel)}</p>
+      <p>${escapeHtml(form.address.value || "Adresse à compléter")}${form.district.value ? " · " + escapeHtml(form.district.value) : ""}</p>
+      ${services.length ? `<p>Activités : ${escapeHtml(services.join(", "))}</p>` : ""}
+      ${cuisines.length ? `<p>Cuisine : ${escapeHtml(cuisines.join(", "))}</p>` : ""}
+    `;
+  }
+
+  function updateWizardChrome() {
+    wizardStepLabel.textContent = `Étape ${currentStep} sur ${TOTAL_STEPS} · ${STEP_TITLES[currentStep - 1]}`;
+    wizardDots.forEach((dot, index) => dot.classList.toggle("active", index === currentStep - 1));
+    wizardBackBtn.disabled = currentStep === 1;
+
+    const isLastStep = currentStep === TOTAL_STEPS;
+    wizardNextBtn.textContent = isLastStep ? "Enregistrer la fiche" : "Suivant →";
+    wizardNextBtn.type = isLastStep ? "submit" : "button";
+    if (isLastStep) renderWizardSummary();
+  }
+
+  function goToStep(step) {
+    currentStep = Math.min(TOTAL_STEPS, Math.max(1, step));
+    wizardSteps.forEach(section => {
+      section.hidden = Number(section.dataset.step) !== currentStep;
+    });
+    updateWizardChrome();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function currentStepInvalidField() {
+    const activeSection = wizardSteps.find(section => Number(section.dataset.step) === currentStep);
+    return [...activeSection.querySelectorAll("[required]")].find(field => !field.checkValidity());
   }
 
   function openAudioDatabase() {
@@ -543,6 +671,8 @@
       toggleRecorder.setAttribute("aria-expanded", "false");
       speechStatus.hidden = true;
       saveError.hidden = true;
+      clearDraft();
+      goToStep(1);
       successDialog.showModal();
     } catch (error) {
       console.warn(error);
@@ -589,6 +719,44 @@
     stopMediaTracks();
     if (recordedAudioUrl) URL.revokeObjectURL(recordedAudioUrl);
   });
+
+  wizardNextBtn.addEventListener("click", event => {
+    if (wizardNextBtn.type === "submit") return;
+    const invalidField = currentStepInvalidField();
+    if (invalidField) {
+      invalidField.reportValidity();
+      invalidField.focus();
+      return;
+    }
+    saveDraft();
+    goToStep(currentStep + 1);
+  });
+
+  wizardBackBtn.addEventListener("click", () => {
+    saveDraft();
+    goToStep(currentStep - 1);
+  });
+
+  form.addEventListener("input", saveDraft);
+  form.addEventListener("change", saveDraft);
+
+  resumeDraftBtn.addEventListener("click", () => {
+    const draft = readDraft();
+    if (draft) applyDraft(draft);
+    draftBanner.hidden = true;
+  });
+
+  discardDraftBtn.addEventListener("click", () => {
+    clearDraft();
+    form.reset();
+    resetAudioDraft();
+    goToStep(1);
+    draftBanner.hidden = true;
+  });
+
+  goToStep(1);
+  const existingDraft = readDraft();
+  if (draftHasContent(existingDraft)) draftBanner.hidden = false;
 
   renderSaved();
 })();

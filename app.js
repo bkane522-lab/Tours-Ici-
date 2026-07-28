@@ -16,7 +16,8 @@
     userPosition: null,
     map: null,
     markersLayer: null,
-    deferredPrompt: null
+    deferredPrompt: null,
+    moreInfoOpen: false
   };
 
   const categoryById = Object.fromEntries(
@@ -256,7 +257,7 @@
             <span>${escapeHtml(place.price || "Prix non indiqué")}</span>
           </div>
           <div class="place-tags">
-            ${combinedTags(place).slice(0, 3).map(tag => `<span>${escapeHtml(tag)}</span>`).join("")}
+            ${combinedTags(place).slice(0, 2).map(tag => `<span>${escapeHtml(tag)}</span>`).join("")}
           </div>
           <div class="place-actions">
             <button class="details-btn" type="button">Voir</button>
@@ -423,42 +424,46 @@
         <h2>${escapeHtml(place.name)}</h2>
         <p class="lead">${escapeHtml(place.description || "Informations à compléter.")}</p>
 
-        ${place.services?.length ? `
-          <section class="detail-attributes">
-            <small>CE QUE PROPOSE LE LIEU</small>
-            <div class="place-tags">
-              ${place.services.map(tag => `<span>${escapeHtml(tag)}</span>`).join("")}
-            </div>
-          </section>
-        ` : ""}
+        <details class="more-info" ${state.moreInfoOpen ? "open" : ""}>
+          <summary>Plus d’informations</summary>
 
-        ${place.cuisines?.length ? `
-          <section class="detail-attributes">
-            <small>CUISINE ET SPÉCIALITÉS</small>
-            <div class="place-tags">
-              ${place.cuisines.map(tag => `<span>${escapeHtml(tag)}</span>`).join("")}
-            </div>
-          </section>
-        ` : ""}
+          ${place.services?.length ? `
+            <section class="detail-attributes">
+              <small>CE QUE PROPOSE LE LIEU</small>
+              <div class="place-tags">
+                ${place.services.map(tag => `<span>${escapeHtml(tag)}</span>`).join("")}
+              </div>
+            </section>
+          ` : ""}
 
-        ${place.tags?.length ? `
-          <div class="place-tags">
-            ${place.tags.map(tag => `<span>${escapeHtml(tag)}</span>`).join("")}
+          ${place.cuisines?.length ? `
+            <section class="detail-attributes">
+              <small>CUISINE ET SPÉCIALITÉS</small>
+              <div class="place-tags">
+                ${place.cuisines.map(tag => `<span>${escapeHtml(tag)}</span>`).join("")}
+              </div>
+            </section>
+          ` : ""}
+
+          ${place.tags?.length ? `
+            <div class="place-tags">
+              ${place.tags.map(tag => `<span>${escapeHtml(tag)}</span>`).join("")}
+            </div>
+          ` : ""}
+
+          <div class="info-grid">
+            <div class="info-box"><small>ADRESSE</small><strong>${escapeHtml(place.address || "À compléter")}</strong></div>
+            <div class="info-box"><small>STATUT</small><strong>${open ? "Ouvert maintenant" : "Fermé actuellement"}</strong></div>
+            <div class="info-box"><small>HORAIRES</small><strong>${escapeHtml(place.hours?.open || "—")} – ${escapeHtml(place.hours?.close || "—")}</strong></div>
+            <div class="info-box"><small>BUDGET</small><strong>${escapeHtml(place.price || "Non indiqué")}</strong></div>
           </div>
-        ` : ""}
 
-        <div class="info-grid">
-          <div class="info-box"><small>ADRESSE</small><strong>${escapeHtml(place.address || "À compléter")}</strong></div>
-          <div class="info-box"><small>STATUT</small><strong>${open ? "Ouvert maintenant" : "Fermé actuellement"}</strong></div>
-          <div class="info-box"><small>HORAIRES</small><strong>${escapeHtml(place.hours?.open || "—")} – ${escapeHtml(place.hours?.close || "—")}</strong></div>
-          <div class="info-box"><small>BUDGET</small><strong>${escapeHtml(place.price || "Non indiqué")}</strong></div>
-        </div>
-
-        ${hasContact ? `
-        <div class="contact-row">
-          ${place.phone ? `<a class="contact-chip" href="tel:${escapeHtml(telHref(place.phone))}">☎ ${escapeHtml(place.phone)}</a>` : ""}
-          ${website ? `<a class="contact-chip" href="${escapeHtml(website)}" target="_blank" rel="noopener noreferrer nofollow">↗ Site internet</a>` : ""}
-        </div>` : ""}
+          ${hasContact ? `
+          <div class="contact-row">
+            ${place.phone ? `<a class="contact-chip" href="tel:${escapeHtml(telHref(place.phone))}">☎ ${escapeHtml(place.phone)}</a>` : ""}
+            ${website ? `<a class="contact-chip" href="${escapeHtml(website)}" target="_blank" rel="noopener noreferrer nofollow">↗ Site internet</a>` : ""}
+          </div>` : ""}
+        </details>
 
         <div class="dialog-actions">
           <a href="${mapsUrl(place)}" target="_blank" rel="noopener">Itinéraire</a>
@@ -466,6 +471,11 @@
         </div>
       </div>
     `;
+
+    els.dialogContent.querySelector(".more-info")?.addEventListener("toggle", event => {
+      state.moreInfoOpen = event.target.open;
+    });
+
     els.dialog.showModal();
   }
 

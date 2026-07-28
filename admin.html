@@ -22,174 +22,202 @@
       <p>Demandez l’autorisation du responsable. Évitez les clients reconnaissables sans accord.</p>
     </section>
 
+    <section id="draftBanner" class="draft-banner" hidden>
+      <p>Une fiche non terminée a été trouvée sur cet appareil.</p>
+      <div>
+        <button id="resumeDraftBtn" class="secondary" type="button">Reprendre le brouillon</button>
+        <button id="discardDraftBtn" class="danger-soft" type="button">Recommencer à zéro</button>
+      </div>
+    </section>
+
     <form id="placeForm">
-      <div class="field full">
-        <label for="name">Nom de l’établissement *</label>
-        <input id="name" name="name" required placeholder="Ex. Le Café du Centre" />
-      </div>
-
-      <div class="field">
-        <label for="category">Catégorie *</label>
-        <select id="category" name="category" required>
-          <option value="restaurant">Restaurant</option>
-          <option value="bar">Bar</option>
-          <option value="barrestaurant">Bar-restaurant</option>
-          <option value="kebab">Kebab</option>
-          <option value="pub">Pub</option>
-          <option value="nightclub">Discothèque</option>
-          <option value="cafe">Café</option>
-          <option value="culture">Culture / Musée</option>
-          <option value="grocery">Épicerie / Commerce</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label for="district">Quartier</label>
-        <input id="district" name="district" placeholder="Vieux-Tours" />
-      </div>
-
-      <fieldset class="choice-section full">
-        <legend>Ce que propose le lieu</legend>
-        <small>Sélectionnez plusieurs activités lorsque l’établissement est polyvalent.</small>
-        <div class="choice-grid" role="group" aria-label="Activités complémentaires">
-          <label class="choice-chip"><input type="checkbox" name="services" value="Café"><span>Café</span></label>
-          <label class="choice-chip"><input type="checkbox" name="services" value="Bar"><span>Bar</span></label>
-          <label class="choice-chip"><input type="checkbox" name="services" value="Restaurant"><span>Restaurant</span></label>
-          <label class="choice-chip"><input type="checkbox" name="services" value="Salon de thé"><span>Salon de thé</span></label>
-          <label class="choice-chip"><input type="checkbox" name="services" value="Crêperie"><span>Crêperie</span></label>
-          <label class="choice-chip"><input type="checkbox" name="services" value="Gaufres"><span>Gaufres</span></label>
-          <label class="choice-chip"><input type="checkbox" name="services" value="Brunch"><span>Brunch</span></label>
-          <label class="choice-chip"><input type="checkbox" name="services" value="Pâtisserie"><span>Pâtisserie</span></label>
-          <label class="choice-chip"><input type="checkbox" name="services" value="Bubble tea"><span>Bubble tea</span></label>
-          <label class="choice-chip"><input type="checkbox" name="services" value="Épicerie"><span>Épicerie</span></label>
-          <label class="choice-chip"><input type="checkbox" name="services" value="À emporter"><span>À emporter</span></label>
-          <label class="choice-chip"><input type="checkbox" name="services" value="Livraison"><span>Livraison</span></label>
+      <div class="wizard-progress full">
+        <span id="wizardStepLabel">Étape 1 sur 4 · Identité</span>
+        <div class="wizard-dots" aria-hidden="true">
+          <span class="active"></span><span></span><span></span><span></span>
         </div>
-      </fieldset>
-
-      <fieldset class="choice-section full">
-        <legend>Type de cuisine ou spécialité</legend>
-        <small>Cette partie peut rester vide si elle ne correspond pas au lieu.</small>
-        <div class="choice-grid cuisine-grid" role="group" aria-label="Types de cuisine">
-          <label class="choice-chip"><input type="checkbox" name="cuisines" value="Française"><span>Française</span></label>
-          <label class="choice-chip"><input type="checkbox" name="cuisines" value="Tourangelle"><span>Tourangelle</span></label>
-          <label class="choice-chip"><input type="checkbox" name="cuisines" value="Coréenne"><span>Coréenne</span></label>
-          <label class="choice-chip"><input type="checkbox" name="cuisines" value="Chinoise"><span>Chinoise</span></label>
-          <label class="choice-chip"><input type="checkbox" name="cuisines" value="Japonaise"><span>Japonaise</span></label>
-          <label class="choice-chip"><input type="checkbox" name="cuisines" value="Thaïlandaise"><span>Thaïlandaise</span></label>
-          <label class="choice-chip"><input type="checkbox" name="cuisines" value="Vietnamienne"><span>Vietnamienne</span></label>
-          <label class="choice-chip"><input type="checkbox" name="cuisines" value="Indienne"><span>Indienne</span></label>
-          <label class="choice-chip"><input type="checkbox" name="cuisines" value="Africaine"><span>Africaine</span></label>
-          <label class="choice-chip"><input type="checkbox" name="cuisines" value="Italienne"><span>Italienne</span></label>
-          <label class="choice-chip"><input type="checkbox" name="cuisines" value="Libanaise"><span>Libanaise</span></label>
-          <label class="choice-chip"><input type="checkbox" name="cuisines" value="Turque"><span>Turque</span></label>
-          <label class="choice-chip"><input type="checkbox" name="cuisines" value="Végétarienne"><span>Végétarienne</span></label>
-          <label class="choice-chip"><input type="checkbox" name="cuisines" value="Vegan"><span>Vegan</span></label>
-        </div>
-      </fieldset>
-
-      <div class="field full">
-        <label for="address">Adresse *</label>
-        <input id="address" name="address" required placeholder="Adresse complète à Tours" />
-        <small>Les coordonnées ne sont plus obligatoires. La fiche pourra être enregistrée et la carte complétée plus tard.</small>
       </div>
 
-      <div class="field">
-        <label for="open">Ouverture</label>
-        <input id="open" name="open" type="time" value="10:00" />
-      </div>
-
-      <div class="field">
-        <label for="close">Fermeture</label>
-        <input id="close" name="close" type="time" value="22:00" />
-      </div>
-
-      <div class="field">
-        <label for="price">Budget</label>
-        <select id="price" name="price">
-          <option value="€">€ — Petit budget</option>
-          <option value="€€" selected>€€ — Moyen</option>
-          <option value="€€€">€€€ — Plus élevé</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label for="phone">Téléphone</label>
-        <input id="phone" name="phone" inputmode="tel" placeholder="02…" />
-      </div>
-
-      <div class="field full">
-        <label for="website">Site ou réseau social</label>
-        <input id="website" name="website" inputmode="url" placeholder="https://…" />
-      </div>
-
-      <div class="field full description-field">
-        <div class="field-label-row">
-          <label for="description">Ce qui rend ce lieu spécial *</label>
-          <div class="smart-actions">
-            <button id="toggleRecorderBtn" class="mini-action" type="button" aria-expanded="false">
-              🎙️ Note audio
-            </button>
-            <button id="speechToTextBtn" class="mini-action dictate-action" type="button">
-              🎙️ Dicter le texte
-            </button>
-          </div>
+      <section class="wizard-step" data-step="1">
+        <div class="field full">
+          <label for="name">Nom de l’établissement *</label>
+          <input id="name" name="name" required placeholder="Ex. Le Café du Centre" />
         </div>
 
-        <textarea id="description" name="description" required rows="5"
-          placeholder="Ambiance, spécialité, accueil, particularité…"></textarea>
+        <div class="field">
+          <label for="category">Catégorie *</label>
+          <select id="category" name="category" required>
+            <option value="restaurant">Restaurant</option>
+            <option value="bar">Bar</option>
+            <option value="barrestaurant">Bar-restaurant</option>
+            <option value="kebab">Kebab</option>
+            <option value="pub">Pub</option>
+            <option value="nightclub">Discothèque</option>
+            <option value="cafe">Café</option>
+            <option value="culture">Culture / Musée</option>
+            <option value="grocery">Épicerie / Commerce</option>
+          </select>
+        </div>
 
-        <section id="audioRecorderPanel" class="audio-recorder" hidden aria-label="Enregistrement d’une note audio">
-          <div class="audio-status">
-            <span id="recordingDot" class="recording-dot" aria-hidden="true"></span>
-            <strong id="audioStatus">Prêt à enregistrer</strong>
-            <span id="audioTimer">00:00</span>
+        <div class="field">
+          <label for="district">Quartier</label>
+          <input id="district" name="district" placeholder="Vieux-Tours" />
+        </div>
+
+        <div class="field full">
+          <label for="address">Adresse *</label>
+          <input id="address" name="address" required placeholder="Adresse complète à Tours" />
+          <small>Les coordonnées ne sont plus obligatoires. La fiche pourra être enregistrée et la carte complétée plus tard.</small>
+        </div>
+      </section>
+
+      <section class="wizard-step" data-step="2" hidden>
+        <fieldset class="choice-section full">
+          <legend>Ce que propose le lieu</legend>
+          <small>Sélectionnez plusieurs activités lorsque l’établissement est polyvalent.</small>
+          <div class="choice-grid" role="group" aria-label="Activités complémentaires">
+            <label class="choice-chip"><input type="checkbox" name="services" value="Café"><span>Café</span></label>
+            <label class="choice-chip"><input type="checkbox" name="services" value="Bar"><span>Bar</span></label>
+            <label class="choice-chip"><input type="checkbox" name="services" value="Restaurant"><span>Restaurant</span></label>
+            <label class="choice-chip"><input type="checkbox" name="services" value="Salon de thé"><span>Salon de thé</span></label>
+            <label class="choice-chip"><input type="checkbox" name="services" value="Crêperie"><span>Crêperie</span></label>
+            <label class="choice-chip"><input type="checkbox" name="services" value="Gaufres"><span>Gaufres</span></label>
+            <label class="choice-chip"><input type="checkbox" name="services" value="Brunch"><span>Brunch</span></label>
+            <label class="choice-chip"><input type="checkbox" name="services" value="Pâtisserie"><span>Pâtisserie</span></label>
+            <label class="choice-chip"><input type="checkbox" name="services" value="Bubble tea"><span>Bubble tea</span></label>
+            <label class="choice-chip"><input type="checkbox" name="services" value="Épicerie"><span>Épicerie</span></label>
+            <label class="choice-chip"><input type="checkbox" name="services" value="À emporter"><span>À emporter</span></label>
+            <label class="choice-chip"><input type="checkbox" name="services" value="Livraison"><span>Livraison</span></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="choice-section full">
+          <legend>Type de cuisine ou spécialité</legend>
+          <small>Cette partie peut rester vide si elle ne correspond pas au lieu.</small>
+          <div class="choice-grid cuisine-grid" role="group" aria-label="Types de cuisine">
+            <label class="choice-chip"><input type="checkbox" name="cuisines" value="Française"><span>Française</span></label>
+            <label class="choice-chip"><input type="checkbox" name="cuisines" value="Tourangelle"><span>Tourangelle</span></label>
+            <label class="choice-chip"><input type="checkbox" name="cuisines" value="Coréenne"><span>Coréenne</span></label>
+            <label class="choice-chip"><input type="checkbox" name="cuisines" value="Chinoise"><span>Chinoise</span></label>
+            <label class="choice-chip"><input type="checkbox" name="cuisines" value="Japonaise"><span>Japonaise</span></label>
+            <label class="choice-chip"><input type="checkbox" name="cuisines" value="Thaïlandaise"><span>Thaïlandaise</span></label>
+            <label class="choice-chip"><input type="checkbox" name="cuisines" value="Vietnamienne"><span>Vietnamienne</span></label>
+            <label class="choice-chip"><input type="checkbox" name="cuisines" value="Indienne"><span>Indienne</span></label>
+            <label class="choice-chip"><input type="checkbox" name="cuisines" value="Africaine"><span>Africaine</span></label>
+            <label class="choice-chip"><input type="checkbox" name="cuisines" value="Italienne"><span>Italienne</span></label>
+            <label class="choice-chip"><input type="checkbox" name="cuisines" value="Libanaise"><span>Libanaise</span></label>
+            <label class="choice-chip"><input type="checkbox" name="cuisines" value="Turque"><span>Turque</span></label>
+            <label class="choice-chip"><input type="checkbox" name="cuisines" value="Végétarienne"><span>Végétarienne</span></label>
+            <label class="choice-chip"><input type="checkbox" name="cuisines" value="Vegan"><span>Vegan</span></label>
+          </div>
+        </fieldset>
+
+        <div class="field full description-field">
+          <div class="field-label-row">
+            <label for="description">Ce qui rend ce lieu spécial *</label>
+            <div class="smart-actions">
+              <button id="toggleRecorderBtn" class="mini-action" type="button" aria-expanded="false">
+                🎙️ Note audio
+              </button>
+              <button id="speechToTextBtn" class="mini-action dictate-action" type="button">
+                🎙️ Dicter le texte
+              </button>
+            </div>
           </div>
 
-          <audio id="audioPlayback" controls hidden></audio>
+          <textarea id="description" name="description" required rows="5"
+            placeholder="Ambiance, spécialité, accueil, particularité…"></textarea>
 
-          <div class="audio-actions">
-            <button id="startRecordingBtn" class="secondary" type="button">Démarrer</button>
-            <button id="stopRecordingBtn" class="secondary" type="button" disabled>Arrêter</button>
-            <button id="deleteRecordingBtn" class="danger-soft" type="button" hidden>Supprimer</button>
-          </div>
+          <section id="audioRecorderPanel" class="audio-recorder" hidden aria-label="Enregistrement d’une note audio">
+            <div class="audio-status">
+              <span id="recordingDot" class="recording-dot" aria-hidden="true"></span>
+              <strong id="audioStatus">Prêt à enregistrer</strong>
+              <span id="audioTimer">00:00</span>
+            </div>
 
+            <audio id="audioPlayback" controls hidden></audio>
+
+            <div class="audio-actions">
+              <button id="startRecordingBtn" class="secondary" type="button">Démarrer</button>
+              <button id="stopRecordingBtn" class="secondary" type="button" disabled>Arrêter</button>
+              <button id="deleteRecordingBtn" class="danger-soft" type="button" hidden>Supprimer</button>
+            </div>
+
+            <small>
+              Note privée, conservée sur ce téléphone pendant 60 secondes maximum.
+              Elle n’est pas publiée dans la fiche visible par les visiteurs.
+            </small>
+          </section>
+
+          <div id="speechStatus" class="speech-status" hidden role="status"></div>
           <small>
-            Note privée, conservée sur ce téléphone pendant 60 secondes maximum.
-            Elle n’est pas publiée dans la fiche visible par les visiteurs.
+            La dictée remplit uniquement ce champ. Relisez toujours le texte avant d’enregistrer la fiche.
           </small>
-        </section>
+        </div>
+      </section>
 
-        <div id="speechStatus" class="speech-status" hidden role="status"></div>
-        <small>
-          La dictée remplit uniquement ce champ. Relisez toujours le texte avant d’enregistrer la fiche.
-        </small>
+      <section class="wizard-step" data-step="3" hidden>
+        <div class="field">
+          <label for="open">Ouverture</label>
+          <input id="open" name="open" type="time" value="10:00" />
+        </div>
+
+        <div class="field">
+          <label for="close">Fermeture</label>
+          <input id="close" name="close" type="time" value="22:00" />
+        </div>
+
+        <div class="field">
+          <label for="price">Budget</label>
+          <select id="price" name="price">
+            <option value="€">€ — Petit budget</option>
+            <option value="€€" selected>€€ — Moyen</option>
+            <option value="€€€">€€€ — Plus élevé</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="phone">Téléphone</label>
+          <input id="phone" name="phone" inputmode="tel" placeholder="02…" />
+        </div>
+
+        <div class="field full">
+          <label for="website">Site ou réseau social</label>
+          <input id="website" name="website" inputmode="url" placeholder="https://…" />
+        </div>
+
+        <div class="field full">
+          <label for="tags">Mots-clés</label>
+          <input id="tags" name="tags" placeholder="Terrasse, familial, cocktails" />
+          <small>Séparez les mots par des virgules.</small>
+        </div>
+
+        <div class="field full checkbox-field">
+          <input id="verified" name="verified" type="checkbox" />
+          <label for="verified">J’ai rencontré le responsable et vérifié les informations.</label>
+        </div>
+      </section>
+
+      <section class="wizard-step" data-step="4" hidden>
+        <div class="field full">
+          <label for="photos">Photos prises sur place</label>
+          <input id="photos" name="photos" type="file" accept="image/*" multiple capture="environment" />
+          <small>La première photo sera redimensionnée et enregistrée comme photo principale sur ce téléphone. Les photos ne font pas partie du brouillon : si vous quittez avant d’enregistrer, il faudra les resélectionner.</small>
+          <div id="photoPreview" class="photo-preview"></div>
+        </div>
+
+        <div id="wizardSummary" class="wizard-summary full"></div>
+
+        <p id="saveError" class="save-error full" role="alert" hidden>
+          Stockage plein sur cet appareil. Supprimez une fiche existante ou libérez de l’espace, puis réessayez.
+          Vos informations restent dans le formulaire.
+        </p>
+      </section>
+
+      <div class="wizard-nav full">
+        <button id="wizardBackBtn" class="secondary" type="button" disabled>← Retour</button>
+        <button id="wizardNextBtn" class="primary" type="button">Suivant →</button>
       </div>
-
-      <div class="field full">
-        <label for="tags">Mots-clés</label>
-        <input id="tags" name="tags" placeholder="Terrasse, familial, cocktails" />
-        <small>Séparez les mots par des virgules.</small>
-      </div>
-
-      <div class="field full checkbox-field">
-        <input id="verified" name="verified" type="checkbox" />
-        <label for="verified">J’ai rencontré le responsable et vérifié les informations.</label>
-      </div>
-
-      <div class="field full">
-        <label for="photos">Photos prises sur place</label>
-        <input id="photos" name="photos" type="file" accept="image/*" multiple capture="environment" />
-        <small>La première photo sera redimensionnée et enregistrée comme photo principale sur ce téléphone.</small>
-        <div id="photoPreview" class="photo-preview"></div>
-      </div>
-
-      <p id="saveError" class="save-error" role="alert" hidden>
-        Stockage plein sur cet appareil. Supprimez une fiche existante ou libérez de l’espace, puis réessayez.
-        Vos informations restent dans le formulaire.
-      </p>
-
-      <button class="primary full" type="submit">Enregistrer la fiche</button>
     </form>
 
     <section class="saved-section">
