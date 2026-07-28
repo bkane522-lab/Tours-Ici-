@@ -58,3 +58,19 @@ La première photo choisie dans l’espace terrain est compressée et enregistr�
 - visuel principal recompressé ;
 - ressources tierces Leaflet/OSM exclues du cache applicatif ;
 - cache renouvelé.
+
+## Fusion multi-activités / audio — 28/07/2026
+
+Base de référence : cette version royale (identité, contact téléphone/site web, icônes PWA séparées, toutes les fonctions existantes conservées).
+
+Ajouts intégrés par-dessus cette base :
+- coordonnées latitude/longitude devenues optionnelles dans l’espace terrain (plus de champs obligatoires ni de bouton de géolocalisation) ;
+- une fiche sans coordonnées n’apparaît jamais sur la carte et n’est jamais positionnée par défaut à 0,0 ;
+- établissements multi-activités (ex. Bar-restaurant) et sélection de plusieurs types de cuisine ;
+- nouvelles catégories Bar-restaurant et Épicerie / Commerce, cette dernière avec un filtre public visible ;
+- recherche étendue aux activités et cuisines saisies ;
+- note audio privée (60 secondes maximum, stockée dans IndexedDB sur l’appareil, jamais publiée) ;
+- dictée vocale dans le champ « Ce qui rend ce lieu spécial », sans aucun service IA connecté ;
+- cibles tactiles des nouveaux éléments portées à 44 px minimum ;
+- libellé du bouton de favoris désormais dynamique (« Ajouter aux favoris » / « Retirer des favoris ») ;
+- nouveau nom de cache PWA pour que la mise à jour soit bien reçue sur les téléphones déjà installés.

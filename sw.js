@@ -1,4 +1,4 @@
-const CACHE_NAME = "tours-ici-royal-20260727-final1";
+const CACHE_NAME = "tours-ici-royal-multiactivites-20260728";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -13,6 +13,8 @@ const APP_SHELL = [
   "./assets/icon-all.svg",
   "./assets/icon-restaurant.svg",
   "./assets/icon-bar.svg",
+  "./assets/icon-barrestaurant.svg",
+  "./assets/icon-grocery.svg",
   "./assets/icon-kebab.svg",
   "./assets/icon-pub.svg",
   "./assets/icon-nightclub.svg",

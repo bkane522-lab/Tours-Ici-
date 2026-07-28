@@ -13,8 +13,8 @@
     <header>
       <a href="index.html">← Retour à Tours Ici</a>
       <p>ESPACE TERRAIN</p>
-      <h1>Ajouter une adresse rencontrée</h1>
-      <span>Cette première version enregistre les fiches uniquement sur l’appareil utilisé.</span>
+      <h1>Ajouter une adresse</h1>
+      <span>Vous pouvez préparer une fiche même sans être sur place. Elle sera enregistrée uniquement sur l’appareil utilisé.</span>
     </header>
 
     <section class="consent-note">
@@ -33,11 +33,13 @@
         <select id="category" name="category" required>
           <option value="restaurant">Restaurant</option>
           <option value="bar">Bar</option>
+          <option value="barrestaurant">Bar-restaurant</option>
           <option value="kebab">Kebab</option>
           <option value="pub">Pub</option>
           <option value="nightclub">Discothèque</option>
           <option value="cafe">Café</option>
           <option value="culture">Culture / Musée</option>
+          <option value="grocery">Épicerie / Commerce</option>
         </select>
       </div>
 
@@ -46,22 +48,51 @@
         <input id="district" name="district" placeholder="Vieux-Tours" />
       </div>
 
+      <fieldset class="choice-section full">
+        <legend>Ce que propose le lieu</legend>
+        <small>Sélectionnez plusieurs activités lorsque l’établissement est polyvalent.</small>
+        <div class="choice-grid" role="group" aria-label="Activités complémentaires">
+          <label class="choice-chip"><input type="checkbox" name="services" value="Café"><span>Café</span></label>
+          <label class="choice-chip"><input type="checkbox" name="services" value="Bar"><span>Bar</span></label>
+          <label class="choice-chip"><input type="checkbox" name="services" value="Restaurant"><span>Restaurant</span></label>
+          <label class="choice-chip"><input type="checkbox" name="services" value="Salon de thé"><span>Salon de thé</span></label>
+          <label class="choice-chip"><input type="checkbox" name="services" value="Crêperie"><span>Crêperie</span></label>
+          <label class="choice-chip"><input type="checkbox" name="services" value="Gaufres"><span>Gaufres</span></label>
+          <label class="choice-chip"><input type="checkbox" name="services" value="Brunch"><span>Brunch</span></label>
+          <label class="choice-chip"><input type="checkbox" name="services" value="Pâtisserie"><span>Pâtisserie</span></label>
+          <label class="choice-chip"><input type="checkbox" name="services" value="Bubble tea"><span>Bubble tea</span></label>
+          <label class="choice-chip"><input type="checkbox" name="services" value="Épicerie"><span>Épicerie</span></label>
+          <label class="choice-chip"><input type="checkbox" name="services" value="À emporter"><span>À emporter</span></label>
+          <label class="choice-chip"><input type="checkbox" name="services" value="Livraison"><span>Livraison</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset class="choice-section full">
+        <legend>Type de cuisine ou spécialité</legend>
+        <small>Cette partie peut rester vide si elle ne correspond pas au lieu.</small>
+        <div class="choice-grid cuisine-grid" role="group" aria-label="Types de cuisine">
+          <label class="choice-chip"><input type="checkbox" name="cuisines" value="Française"><span>Française</span></label>
+          <label class="choice-chip"><input type="checkbox" name="cuisines" value="Tourangelle"><span>Tourangelle</span></label>
+          <label class="choice-chip"><input type="checkbox" name="cuisines" value="Coréenne"><span>Coréenne</span></label>
+          <label class="choice-chip"><input type="checkbox" name="cuisines" value="Chinoise"><span>Chinoise</span></label>
+          <label class="choice-chip"><input type="checkbox" name="cuisines" value="Japonaise"><span>Japonaise</span></label>
+          <label class="choice-chip"><input type="checkbox" name="cuisines" value="Thaïlandaise"><span>Thaïlandaise</span></label>
+          <label class="choice-chip"><input type="checkbox" name="cuisines" value="Vietnamienne"><span>Vietnamienne</span></label>
+          <label class="choice-chip"><input type="checkbox" name="cuisines" value="Indienne"><span>Indienne</span></label>
+          <label class="choice-chip"><input type="checkbox" name="cuisines" value="Africaine"><span>Africaine</span></label>
+          <label class="choice-chip"><input type="checkbox" name="cuisines" value="Italienne"><span>Italienne</span></label>
+          <label class="choice-chip"><input type="checkbox" name="cuisines" value="Libanaise"><span>Libanaise</span></label>
+          <label class="choice-chip"><input type="checkbox" name="cuisines" value="Turque"><span>Turque</span></label>
+          <label class="choice-chip"><input type="checkbox" name="cuisines" value="Végétarienne"><span>Végétarienne</span></label>
+          <label class="choice-chip"><input type="checkbox" name="cuisines" value="Vegan"><span>Vegan</span></label>
+        </div>
+      </fieldset>
+
       <div class="field full">
         <label for="address">Adresse *</label>
         <input id="address" name="address" required placeholder="Adresse complète à Tours" />
+        <small>Les coordonnées ne sont plus obligatoires. La fiche pourra être enregistrée et la carte complétée plus tard.</small>
       </div>
-
-      <div class="field">
-        <label for="lat">Latitude *</label>
-        <input id="lat" name="lat" required inputmode="decimal" placeholder="47.394" />
-      </div>
-
-      <div class="field">
-        <label for="lng">Longitude *</label>
-        <input id="lng" name="lng" required inputmode="decimal" placeholder="0.685" />
-      </div>
-
-      <button id="useLocationBtn" class="secondary full" type="button">◎ Utiliser ma position actuelle</button>
 
       <div class="field">
         <label for="open">Ouverture</label>
@@ -92,9 +123,47 @@
         <input id="website" name="website" inputmode="url" placeholder="https://…" />
       </div>
 
-      <div class="field full">
-        <label for="description">Ce qui rend ce lieu spécial *</label>
-        <textarea id="description" name="description" required rows="4" placeholder="Ambiance, spécialité, accueil, particularité…"></textarea>
+      <div class="field full description-field">
+        <div class="field-label-row">
+          <label for="description">Ce qui rend ce lieu spécial *</label>
+          <div class="smart-actions">
+            <button id="toggleRecorderBtn" class="mini-action" type="button" aria-expanded="false">
+              🎙️ Note audio
+            </button>
+            <button id="speechToTextBtn" class="mini-action dictate-action" type="button">
+              🎙️ Dicter le texte
+            </button>
+          </div>
+        </div>
+
+        <textarea id="description" name="description" required rows="5"
+          placeholder="Ambiance, spécialité, accueil, particularité…"></textarea>
+
+        <section id="audioRecorderPanel" class="audio-recorder" hidden aria-label="Enregistrement d’une note audio">
+          <div class="audio-status">
+            <span id="recordingDot" class="recording-dot" aria-hidden="true"></span>
+            <strong id="audioStatus">Prêt à enregistrer</strong>
+            <span id="audioTimer">00:00</span>
+          </div>
+
+          <audio id="audioPlayback" controls hidden></audio>
+
+          <div class="audio-actions">
+            <button id="startRecordingBtn" class="secondary" type="button">Démarrer</button>
+            <button id="stopRecordingBtn" class="secondary" type="button" disabled>Arrêter</button>
+            <button id="deleteRecordingBtn" class="danger-soft" type="button" hidden>Supprimer</button>
+          </div>
+
+          <small>
+            Note privée, conservée sur ce téléphone pendant 60 secondes maximum.
+            Elle n’est pas publiée dans la fiche visible par les visiteurs.
+          </small>
+        </section>
+
+        <div id="speechStatus" class="speech-status" hidden role="status"></div>
+        <small>
+          La dictée remplit uniquement ce champ. Relisez toujours le texte avant d’enregistrer la fiche.
+        </small>
       </div>
 
       <div class="field full">
@@ -126,7 +195,7 @@
     <section class="saved-section">
       <div>
         <p>FICHES AJOUTÉES SUR CE TÉLÉPHONE</p>
-        <h2 id="savedCount">0 adresse</h2>
+        <h2 id="savedCount">0 adresses</h2>
       </div>
       <div id="savedPlaces"></div>
     </section>
@@ -134,7 +203,7 @@
 
   <dialog id="successDialog">
     <h2>Adresse enregistrée 🔥</h2>
-    <p>Elle apparaît maintenant dans Tours Ici sur cet appareil.</p>
+    <p>Elle apparaît maintenant dans Tours Ici sur cet appareil. Sa position sur la carte pourra être complétée plus tard.</p>
     <div>
       <a href="index.html">Voir dans l’application</a>
       <button id="addAnotherBtn" type="button">Ajouter une autre</button>

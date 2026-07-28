@@ -2,8 +2,10 @@ window.TOURS_ICI_CATEGORIES = [
   { id: "all", label: "Tout", icon: "assets/icon-all.svg", color: "#0E2233", dark: "#0E2233" },
   { id: "restaurant", label: "Restaurants", icon: "assets/icon-restaurant.svg", color: "#F2765F", dark: "#9F3F35" },
   { id: "bar", label: "Bars", icon: "assets/icon-bar.svg", color: "#1BB6BD", dark: "#0D7075" },
+  { id: "barrestaurant", label: "Bar-restaurant", icon: "assets/icon-barrestaurant.svg", color: "#1AA6A7", dark: "#9F4A3D", hidden: true },
+  { id: "grocery", label: "Épicerie & commerce", icon: "assets/icon-grocery.svg", color: "#D28B39", dark: "#76501F" },
   { id: "kebab", label: "Kebabs", icon: "assets/icon-kebab.svg", color: "#F39A3D", dark: "#975321" },
-  { id: "pub", label: "Pubs", icon: "assets/icon-pub.svg", color: "#4D9D82", dark: "#416B58" },
+  { id: "pub", label: "Pubs", icon: "assets/icon-pub.svg", color: "#4D9D82", dark: "#416B58", hidden: true },
   { id: "nightclub", label: "Discothèques", icon: "assets/icon-nightclub.svg", color: "#7E5E9B", dark: "#583663" },
   { id: "cafe", label: "Cafés", icon: "assets/icon-cafe.svg", color: "#B37A62", dark: "#754732" },
   { id: "culture", label: "Culture", icon: "assets/icon-culture.svg", color: "#3F78A8", dark: "#285171" }

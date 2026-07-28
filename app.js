@@ -36,6 +36,7 @@
     list: document.querySelector("#placesList"),
     mapPanel: document.querySelector("#mapPanel"),
     resultCount: document.querySelector("#resultCount"),
+    resultCountLabel: document.querySelector("#resultCountLabel"),
     emptyState: document.querySelector("#emptyState"),
     resetFilters: document.querySelector("#resetFiltersBtn"),
     dialog: document.querySelector("#placeDialog"),
@@ -100,6 +101,53 @@
       .trim();
   }
 
+  function hasCoordinates(place) {
+    const latitude = place?.lat;
+    const longitude = place?.lng;
+    return latitude !== null &&
+      latitude !== undefined &&
+      latitude !== "" &&
+      longitude !== null &&
+      longitude !== undefined &&
+      longitude !== "" &&
+      Number.isFinite(Number(latitude)) &&
+      Number.isFinite(Number(longitude));
+  }
+
+  function combinedTags(place) {
+    return [...new Set([
+      ...(place.services || []),
+      ...(place.cuisines || []),
+      ...(place.tags || [])
+    ].map(value => String(value).trim()).filter(Boolean))];
+  }
+
+  function placeMatchesCategory(place, categoryId) {
+    if (categoryId === "all") return true;
+    if (place.category === categoryId) return true;
+
+    const services = (place.services || []).map(normalize);
+    const serviceAliases = {
+      restaurant: ["restaurant", "creperie", "brunch"],
+      bar: ["bar"],
+      cafe: ["cafe", "salon de the", "bubble tea"],
+      kebab: ["kebab"],
+      pub: ["pub"],
+      nightclub: ["discotheque"],
+      culture: ["culture", "musee"],
+      grocery: ["epicerie"]
+    };
+
+    if (place.category === "barrestaurant" && ["bar", "restaurant"].includes(categoryId)) {
+      return true;
+    }
+    if (place.category === "pub" && categoryId === "bar") {
+      return true;
+    }
+
+    return (serviceAliases[categoryId] || []).some(alias => services.includes(alias));
+  }
+
   function distanceKm(a, b) {
     const earthRadius = 6371;
     const toRadians = value => value * Math.PI / 180;
@@ -117,12 +165,14 @@
     const query = normalize(state.query);
 
     let places = getPlaces().filter(place => {
-      const matchesCategory = state.category === "all" || place.category === state.category;
+      const matchesCategory = placeMatchesCategory(place, state.category);
       const haystack = normalize([
         place.name,
         place.address,
         place.district,
         place.description,
+        ...(place.services || []),
+        ...(place.cuisines || []),
         ...(place.tags || [])
       ].join(" "));
       const matchesQuery = !query || haystack.includes(query);
@@ -134,18 +184,31 @@
 
     if (state.userPosition) {
       places = places
-        .map(place => ({
-          ...place,
-          distance: distanceKm(state.userPosition, { lat: Number(place.lat), lng: Number(place.lng) })
-        }))
-        .sort((a, b) => a.distance - b.distance);
+        .map(place => hasCoordinates(place)
+          ? {
+              ...place,
+              distance: distanceKm(state.userPosition, {
+                lat: Number(place.lat),
+                lng: Number(place.lng)
+              })
+            }
+          : { ...place, distance: null }
+        )
+        .sort((a, b) => {
+          if (typeof a.distance === "number" && typeof b.distance === "number") {
+            return a.distance - b.distance;
+          }
+          if (typeof a.distance === "number") return -1;
+          if (typeof b.distance === "number") return 1;
+          return 0;
+        });
     }
 
     return places;
   }
 
   function renderFilters() {
-    els.filters.innerHTML = window.TOURS_ICI_CATEGORIES.map(category => `
+    els.filters.innerHTML = window.TOURS_ICI_CATEGORIES.filter(category => !category.hidden).map(category => `
       <button
         class="category-chip ${state.category === category.id ? "active" : ""}"
         type="button"
@@ -193,7 +256,7 @@
             <span>${escapeHtml(place.price || "Prix non indiqué")}</span>
           </div>
           <div class="place-tags">
-            ${(place.tags || []).slice(0, 3).map(tag => `<span>${escapeHtml(tag)}</span>`).join("")}
+            ${combinedTags(place).slice(0, 3).map(tag => `<span>${escapeHtml(tag)}</span>`).join("")}
           </div>
           <div class="place-actions">
             <button class="details-btn" type="button">Voir</button>
@@ -208,6 +271,7 @@
   function renderPlaces() {
     const places = filteredPlaces();
     els.resultCount.textContent = String(places.length);
+    els.resultCountLabel.textContent = places.length === 1 ? "adresse" : "adresses";
     els.list.innerHTML = places.map(placeCard).join("");
     els.emptyState.hidden = places.length !== 0;
     els.list.hidden = state.view !== "list" || places.length === 0;
@@ -254,7 +318,7 @@
     state.markersLayer.clearLayers();
     const bounds = [];
 
-    places.forEach(place => {
+    places.filter(hasCoordinates).forEach(place => {
       const category = categoryById[place.category] || categoryById.all;
       const icon = L.divIcon({
         className: "",
@@ -262,10 +326,10 @@
         iconSize: [36, 36],
         iconAnchor: [18, 36]
       });
-      const marker = L.marker([place.lat, place.lng], { icon }).addTo(state.markersLayer);
+      const marker = L.marker([Number(place.lat), Number(place.lng)], { icon }).addTo(state.markersLayer);
       marker.bindPopup(`<strong>${escapeHtml(place.name)}</strong><br>${escapeHtml(place.address || "Tours")}`);
       marker.on("click", () => setTimeout(() => openPlace(place.id), 120));
-      bounds.push([place.lat, place.lng]);
+      bounds.push([Number(place.lat), Number(place.lng)]);
     });
 
     if (state.userPosition) {
@@ -359,9 +423,29 @@
         <h2>${escapeHtml(place.name)}</h2>
         <p class="lead">${escapeHtml(place.description || "Informations à compléter.")}</p>
 
-        <div class="place-tags">
-          ${(place.tags || []).map(tag => `<span>${escapeHtml(tag)}</span>`).join("")}
-        </div>
+        ${place.services?.length ? `
+          <section class="detail-attributes">
+            <small>CE QUE PROPOSE LE LIEU</small>
+            <div class="place-tags">
+              ${place.services.map(tag => `<span>${escapeHtml(tag)}</span>`).join("")}
+            </div>
+          </section>
+        ` : ""}
+
+        ${place.cuisines?.length ? `
+          <section class="detail-attributes">
+            <small>CUISINE ET SPÉCIALITÉS</small>
+            <div class="place-tags">
+              ${place.cuisines.map(tag => `<span>${escapeHtml(tag)}</span>`).join("")}
+            </div>
+          </section>
+        ` : ""}
+
+        ${place.tags?.length ? `
+          <div class="place-tags">
+            ${place.tags.map(tag => `<span>${escapeHtml(tag)}</span>`).join("")}
+          </div>
+        ` : ""}
 
         <div class="info-grid">
           <div class="info-box"><small>ADRESSE</small><strong>${escapeHtml(place.address || "À compléter")}</strong></div>

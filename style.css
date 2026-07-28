@@ -506,6 +506,9 @@ main { padding: 6px 16px 24px; }
 .dialog-body { padding: 22px; }
 .dialog-body h2 { margin: 0; font-size: 28px; }
 .dialog-body .lead { color: var(--muted); line-height: 1.55; }
+.detail-attributes { margin-top: 14px; }
+.detail-attributes small { display: block; color: var(--muted); font-size: 9px; font-weight: 900; letter-spacing: .1em; margin-bottom: 6px; }
+.detail-attributes .place-tags { margin-top: 0; }
 .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 18px 0; }
 .info-box { padding: 13px; border-radius: 15px; background: white; }
 .info-box small { display: block; color: var(--muted); font-size: 9px; font-weight: 900; letter-spacing: .1em; }
