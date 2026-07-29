@@ -265,8 +265,9 @@ main { padding: 6px 16px 24px; }
 .places-list { display: grid; gap: 12px; padding: 0 12px 16px; }
 .place-card {
   display: grid;
-  grid-template-columns: 116px 1fr;
-  min-height: 140px;
+  grid-template-columns: 104px 1fr;
+  align-items: start;
+  min-height: 155px;
   overflow: hidden;
   border: 1px solid rgba(23,33,43,.07);
   border-radius: 21px;
@@ -275,7 +276,9 @@ main { padding: 6px 16px 24px; }
 }
 .place-cover {
   position: relative;
-  min-height: 140px;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  align-self: start;
   display: grid;
   place-items: center;
   overflow: hidden;
@@ -563,8 +566,7 @@ main { padding: 6px 16px 24px; }
   .hero { min-height: 230px; }
   .category-grid { gap: 6px; }
   .category-chip { min-height: 50px; }
-  .place-card { grid-template-columns: 105px 1fr; align-items: start; min-height: 160px; }
-  .place-cover { width: 105px; height: 105px; min-height: 105px; align-self: start; }
+  .place-card { grid-template-columns: 100px 1fr; align-items: start; min-height: 155px; }
   .place-card-content { padding: 10px 12px 9px; }
   .place-actions { gap: 5px; }
   .place-actions button, .place-actions a { padding: 7px; font-size: 9px; }
@@ -573,7 +575,7 @@ main { padding: 6px 16px 24px; }
 @media (min-width: 600px) {
   main { padding-left: 24px; padding-right: 24px; }
   .places-list { grid-template-columns: 1fr 1fr; }
-  .place-card { grid-template-columns: 105px 1fr; }
+  .place-card { grid-template-columns: 120px 1fr; }
 }
 
 .leaflet-tile-pane {
