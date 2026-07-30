@@ -110,44 +110,53 @@
         <div class="field full description-field">
           <div class="field-label-row">
             <label for="description">Ce qui rend ce lieu spécial *</label>
-            <div class="smart-actions">
-              <button id="toggleRecorderBtn" class="mini-action" type="button" aria-expanded="false">
-                🎙️ Note audio
-              </button>
-              <button id="speechToTextBtn" class="mini-action dictate-action" type="button">
-                🎙️ Dicter le texte
-              </button>
-            </div>
+            <button id="talkSummarizeBtn" class="mini-action talk-action" type="button">
+              🎙️ Parler et résumer
+            </button>
           </div>
 
           <textarea id="description" name="description" required rows="5"
             placeholder="Ambiance, spécialité, accueil, particularité…"></textarea>
 
-          <section id="audioRecorderPanel" class="audio-recorder" hidden aria-label="Enregistrement d’une note audio">
-            <div class="audio-status">
-              <span id="recordingDot" class="recording-dot" aria-hidden="true"></span>
-              <strong id="audioStatus">Prêt à enregistrer</strong>
-              <span id="audioTimer">00:00</span>
+          <section id="talkPanel" class="talk-panel" hidden aria-live="polite" data-state="ready">
+            <div class="talk-auth">
+              <label for="talkAdminKey">Code privé IA</label>
+              <input id="talkAdminKey" type="password" inputmode="text" autocomplete="current-password"
+                placeholder="Votre code privé" />
+              <small>Ce code reste uniquement dans cet onglet et n’est jamais écrit dans le code public.</small>
             </div>
 
-            <audio id="audioPlayback" controls hidden></audio>
+            <div class="talk-status">
+              <span id="talkDot" class="recording-dot" aria-hidden="true"></span>
+              <strong id="talkStatusText">Prêt à enregistrer</strong>
+              <span id="talkTimer">00:00</span>
+            </div>
 
-            <div class="audio-actions">
-              <button id="startRecordingBtn" class="secondary" type="button">Démarrer</button>
-              <button id="stopRecordingBtn" class="secondary" type="button" disabled>Arrêter</button>
-              <button id="deleteRecordingBtn" class="danger-soft" type="button" hidden>Supprimer</button>
+            <div class="talk-actions">
+              <button id="talkStartBtn" class="secondary" type="button">Démarrer</button>
+              <button id="talkStopBtn" class="secondary" type="button" hidden>Arrêter et résumer</button>
+              <button id="talkCancelBtn" class="danger-soft" type="button" hidden>Annuler</button>
+            </div>
+
+            <div id="talkError" class="talk-error" hidden role="alert"></div>
+
+            <div id="talkPreview" class="talk-preview" hidden>
+              <p id="talkResultNotice" class="talk-result-notice" hidden></p>
+              <label for="talkResumeText">Résumé proposé — relisez et modifiez si besoin</label>
+              <textarea id="talkResumeText" rows="3"></textarea>
+
+              <div id="talkSuggestChips" class="talk-suggest-chips"></div>
+
+              <div class="talk-preview-actions">
+                <button id="talkInsertBtn" class="primary" type="button">Insérer dans la description</button>
+                <button id="talkRestartBtn" class="secondary" type="button">Recommencer</button>
+              </div>
             </div>
 
             <small>
-              Note privée, conservée sur ce téléphone pendant 60 secondes maximum.
-              Elle n’est pas publiée dans la fiche visible par les visiteurs.
+              La transcription et le résumé passent par un service IA externe. Rien n’est inséré sans votre validation.
             </small>
           </section>
-
-          <div id="speechStatus" class="speech-status" hidden role="status"></div>
-          <small>
-            La dictée remplit uniquement ce champ. Relisez toujours le texte avant d’enregistrer la fiche.
-          </small>
         </div>
       </section>
 

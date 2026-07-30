@@ -85,18 +85,33 @@ small{color:var(--muted);font-size:10px;line-height:1.35}
 }
 .mini-action[aria-pressed="true"],
 .mini-action.active{color:white;border-color:var(--teal);background:var(--teal)}
-.dictate-action{border-color:#cfe7e4;background:#eaf6f4}
-.audio-recorder{margin-top:4px;padding:14px;border:1px solid #cfe7e4;border-radius:16px;background:#f3faf9}
-.audio-status{display:grid;grid-template-columns:12px 1fr auto;align-items:center;gap:8px;color:var(--night);font-size:11px}
-.recording-dot{width:9px;height:9px;border-radius:999px;background:#aab5ba}
-.audio-recorder.recording .recording-dot{background:#e04d45;box-shadow:0 0 0 5px rgba(224,77,69,.12);animation:recordingPulse 1.2s ease-in-out infinite}
-@keyframes recordingPulse{0%,100%{opacity:1}50%{opacity:.45}}
-.audio-recorder audio{width:100%;margin-top:12px}
-.audio-actions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 9px}
-.audio-actions button{flex:1 1 110px;min-height:44px}
+.talk-action{border-color:#cfe7e4;background:#eaf6f4}
 .danger-soft{border:0;border-radius:15px;min-height:44px;padding:12px;color:#a33f35;background:#fff0ed;font-weight:900}
-.speech-status{margin-top:4px;padding:11px 12px;border-radius:13px;color:#4d3a62;background:#f5edff;font-size:11px;line-height:1.4}
-.speech-status.listening{color:#0d706d;background:#eaf6f4}
+
+/* Panneau "Parler et résumer" */
+.talk-panel{margin-top:4px;padding:14px;border:1px solid #cfe7e4;border-radius:16px;background:#f3faf9}
+.talk-auth{display:grid;gap:6px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px dashed #cfe7e4}
+.talk-auth label{font-size:10px;font-weight:900;color:var(--night)}
+.talk-auth input{width:100%;min-height:44px;border:1px solid var(--line);border-radius:13px;padding:10px 12px;background:white;font:inherit}
+.talk-auth small{font-size:9.5px;line-height:1.35;color:var(--muted)}
+.talk-status{display:grid;grid-template-columns:12px 1fr auto;align-items:center;gap:8px;color:var(--night);font-size:11px}
+.recording-dot{width:9px;height:9px;border-radius:999px;background:#aab5ba}
+.recording-dot.active{background:#e04d45;box-shadow:0 0 0 5px rgba(224,77,69,.12);animation:recordingPulse 1.2s ease-in-out infinite}
+@keyframes recordingPulse{0%,100%{opacity:1}50%{opacity:.45}}
+.talk-actions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 9px}
+.talk-actions button{flex:1 1 110px;min-height:44px}
+.talk-error{margin-top:4px;padding:11px 12px;border-radius:13px;color:#a33f35;background:#fff0ed;font-size:11.5px;line-height:1.4;font-weight:700}
+.talk-preview{margin-top:10px;padding-top:10px;border-top:1px dashed #cfe7e4}
+.talk-result-notice{margin:0 0 10px;padding:10px 11px;border-radius:12px;background:#fff8df;color:#735d1b;font-size:10.5px;line-height:1.4;font-weight:800}
+.talk-preview label{display:block;font-size:10px;font-weight:900;color:var(--night);margin-bottom:6px}
+.talk-preview textarea{width:100%;border:1px solid var(--line);border-radius:13px;padding:10px;font:inherit;font-size:12.5px;line-height:1.45;background:white}
+.talk-chip-group{margin-top:10px}
+.talk-chip-group small{display:block;font-size:9px;font-weight:900;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
+.talk-chip-row{display:flex;flex-wrap:wrap;gap:6px}
+.talk-chip{min-height:38px;padding:7px 12px;border:1px solid var(--line);border-radius:999px;background:white;color:#59656d;font-size:11px;font-weight:800}
+.talk-chip.active{color:white;border-color:var(--teal);background:var(--teal)}
+.talk-preview-actions{display:flex;gap:8px;margin-top:12px}
+.talk-preview-actions button{flex:1;min-height:44px}
 @media(max-width:480px){.choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.mini-action{flex:1 1 0}}
 
 /* Bannière de reprise de brouillon */

@@ -1,4 +1,4 @@
-const CACHE_NAME = "tours-ici-cards-map-wizard-fix-20260728b";
+const CACHE_NAME = "tours-ici-ai-final-adapte-20260730";
 const APP_SHELL = [
   "./",
   "./index.html",

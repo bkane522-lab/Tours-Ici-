@@ -3,11 +3,13 @@
 
   const PLACE_KEY = "toursIciCustomPlaces";
   const DRAFT_KEY = "toursIciDraftPlace";
-  const AUDIO_DB_NAME = "toursIciMedia";
-  const AUDIO_STORE = "audioNotes";
-  const MAX_RECORDING_SECONDS = 60;
   const TOTAL_STEPS = 4;
   const STEP_TITLES = ["Identité", "Ce qui le rend spécial", "Infos pratiques", "Photos et validation"];
+
+  const TALK_ENDPOINT = "/api/parler-resumer";
+  const TALK_KEY_SESSION = "toursIciAiAdminKey";
+  const MAX_TALK_SECONDS = 60;
+  const TALK_REQUEST_TIMEOUT_MS = 55000;
 
   const form = document.querySelector("#placeForm");
   const preview = document.querySelector("#photoPreview");
@@ -17,6 +19,7 @@
   const successDialog = document.querySelector("#successDialog");
   const addAnother = document.querySelector("#addAnotherBtn");
   const saveError = document.querySelector("#saveError");
+  const description = document.querySelector("#description");
 
   const wizardSteps = [...document.querySelectorAll(".wizard-step")];
   const wizardStepLabel = document.querySelector("#wizardStepLabel");
@@ -30,27 +33,32 @@
 
   let currentStep = 1;
 
-  const recorderPanel = document.querySelector("#audioRecorderPanel");
-  const toggleRecorder = document.querySelector("#toggleRecorderBtn");
-  const startRecording = document.querySelector("#startRecordingBtn");
-  const stopRecording = document.querySelector("#stopRecordingBtn");
-  const deleteRecording = document.querySelector("#deleteRecordingBtn");
-  const audioPlayback = document.querySelector("#audioPlayback");
-  const audioStatus = document.querySelector("#audioStatus");
-  const audioTimer = document.querySelector("#audioTimer");
+  // --- Parler et résumer (capture + IA) ---
+  const talkButton = document.querySelector("#talkSummarizeBtn");
+  const talkPanel = document.querySelector("#talkPanel");
+  const talkAdminKey = document.querySelector("#talkAdminKey");
+  const talkDot = document.querySelector("#talkDot");
+  const talkStatusText = document.querySelector("#talkStatusText");
+  const talkTimer = document.querySelector("#talkTimer");
+  const talkStartBtn = document.querySelector("#talkStartBtn");
+  const talkStopBtn = document.querySelector("#talkStopBtn");
+  const talkCancelBtn = document.querySelector("#talkCancelBtn");
+  const talkErrorBox = document.querySelector("#talkError");
+  const talkPreview = document.querySelector("#talkPreview");
+  const talkResultNotice = document.querySelector("#talkResultNotice");
+  const talkResumeText = document.querySelector("#talkResumeText");
+  const talkSuggestChips = document.querySelector("#talkSuggestChips");
+  const talkInsertBtn = document.querySelector("#talkInsertBtn");
+  const talkRestartBtn = document.querySelector("#talkRestartBtn");
 
-  const speechButton = document.querySelector("#speechToTextBtn");
-  const speechStatus = document.querySelector("#speechStatus");
-  const description = document.querySelector("#description");
-
-  let mediaRecorder = null;
-  let mediaStream = null;
-  let recordedChunks = [];
-  let recordedAudioBlob = null;
-  let recordedAudioUrl = "";
-  let recordingStartedAt = 0;
-  let recordingTimerId = null;
-  let speechRecognition = null;
+  let talkMediaRecorder = null;
+  let talkMediaStream = null;
+  let talkChunks = [];
+  let talkStartedAt = 0;
+  let talkTimerId = null;
+  let talkAbortController = null;
+  let talkCancelled = false;
+  let talkSelected = { activities: new Set(), cuisines: new Set(), keywords: new Set() };
 
   const categoryColors = {
     restaurant: ["#EF6F61", "#F5B642"],
@@ -209,74 +217,6 @@
     return [...activeSection.querySelectorAll("[required]")].find(field => !field.checkValidity());
   }
 
-  function openAudioDatabase() {
-    return new Promise((resolve, reject) => {
-      if (!("indexedDB" in window)) {
-        reject(new Error("Le stockage audio n’est pas disponible sur ce navigateur."));
-        return;
-      }
-
-      const request = indexedDB.open(AUDIO_DB_NAME, 1);
-      request.onerror = () => reject(request.error || new Error("Ouverture du stockage audio impossible."));
-      request.onupgradeneeded = () => {
-        const db = request.result;
-        if (!db.objectStoreNames.contains(AUDIO_STORE)) {
-          db.createObjectStore(AUDIO_STORE);
-        }
-      };
-      request.onsuccess = () => resolve(request.result);
-    });
-  }
-
-  async function putAudio(id, blob) {
-    const db = await openAudioDatabase();
-    return new Promise((resolve, reject) => {
-      const transaction = db.transaction(AUDIO_STORE, "readwrite");
-      transaction.objectStore(AUDIO_STORE).put(blob, id);
-      transaction.oncomplete = () => {
-        db.close();
-        resolve();
-      };
-      transaction.onerror = () => {
-        db.close();
-        reject(transaction.error || new Error("Enregistrement audio impossible."));
-      };
-    });
-  }
-
-  async function getAudio(id) {
-    const db = await openAudioDatabase();
-    return new Promise((resolve, reject) => {
-      const transaction = db.transaction(AUDIO_STORE, "readonly");
-      const request = transaction.objectStore(AUDIO_STORE).get(id);
-      request.onsuccess = () => {
-        db.close();
-        resolve(request.result || null);
-      };
-      request.onerror = () => {
-        db.close();
-        reject(request.error || new Error("Lecture audio impossible."));
-      };
-    });
-  }
-
-  async function removeAudio(id) {
-    if (!id || !("indexedDB" in window)) return;
-    const db = await openAudioDatabase();
-    return new Promise((resolve, reject) => {
-      const transaction = db.transaction(AUDIO_STORE, "readwrite");
-      transaction.objectStore(AUDIO_STORE).delete(id);
-      transaction.oncomplete = () => {
-        db.close();
-        resolve();
-      };
-      transaction.onerror = () => {
-        db.close();
-        reject(transaction.error || new Error("Suppression audio impossible."));
-      };
-    });
-  }
-
   function compressPhoto(file, maxSize = 800, quality = 0.7) {
     return new Promise((resolve, reject) => {
       if (!file || !file.type.startsWith("image/")) {
@@ -308,122 +248,6 @@
     });
   }
 
-  function formatTimer(seconds) {
-    const safeSeconds = Math.max(0, Math.min(MAX_RECORDING_SECONDS, seconds));
-    const minutes = Math.floor(safeSeconds / 60);
-    const remaining = safeSeconds % 60;
-    return `${String(minutes).padStart(2, "0")}:${String(remaining).padStart(2, "0")}`;
-  }
-
-  function preferredAudioMimeType() {
-    if (!window.MediaRecorder) return "";
-    const candidates = [
-      "audio/webm;codecs=opus",
-      "audio/ogg;codecs=opus",
-      "audio/mp4"
-    ];
-    return candidates.find(type => MediaRecorder.isTypeSupported?.(type)) || "";
-  }
-
-  function stopMediaTracks() {
-    mediaStream?.getTracks().forEach(track => track.stop());
-    mediaStream = null;
-  }
-
-  function clearRecordingTimer() {
-    if (recordingTimerId) clearInterval(recordingTimerId);
-    recordingTimerId = null;
-  }
-
-  function resetAudioDraft() {
-    clearRecordingTimer();
-    stopMediaTracks();
-
-    if (recordedAudioUrl) URL.revokeObjectURL(recordedAudioUrl);
-    recordedAudioUrl = "";
-    recordedAudioBlob = null;
-    recordedChunks = [];
-    mediaRecorder = null;
-
-    audioPlayback.pause();
-    audioPlayback.removeAttribute("src");
-    audioPlayback.hidden = true;
-    audioTimer.textContent = "00:00";
-    audioStatus.textContent = "Prêt à enregistrer";
-    recorderPanel.classList.remove("recording");
-    startRecording.disabled = false;
-    stopRecording.disabled = true;
-    deleteRecording.hidden = true;
-  }
-
-  async function startAudioRecording() {
-    if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
-      alert("L’enregistrement audio n’est pas pris en charge par ce navigateur.");
-      return;
-    }
-
-    try {
-      resetAudioDraft();
-      mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mimeType = preferredAudioMimeType();
-      mediaRecorder = mimeType
-        ? new MediaRecorder(mediaStream, { mimeType })
-        : new MediaRecorder(mediaStream);
-
-      recordedChunks = [];
-      mediaRecorder.addEventListener("dataavailable", event => {
-        if (event.data?.size) recordedChunks.push(event.data);
-      });
-
-      mediaRecorder.addEventListener("stop", () => {
-        clearRecordingTimer();
-        stopMediaTracks();
-        recorderPanel.classList.remove("recording");
-
-        if (!recordedChunks.length) {
-          audioStatus.textContent = "Aucun son enregistré";
-          startRecording.disabled = false;
-          return;
-        }
-
-        recordedAudioBlob = new Blob(recordedChunks, {
-          type: mediaRecorder.mimeType || recordedChunks[0].type || "audio/webm"
-        });
-        recordedAudioUrl = URL.createObjectURL(recordedAudioBlob);
-        audioPlayback.src = recordedAudioUrl;
-        audioPlayback.hidden = false;
-        deleteRecording.hidden = false;
-        startRecording.disabled = false;
-        stopRecording.disabled = true;
-        audioStatus.textContent = "Note audio prête";
-      });
-
-      mediaRecorder.start(500);
-      recordingStartedAt = Date.now();
-      recorderPanel.classList.add("recording");
-      audioStatus.textContent = "Enregistrement en cours";
-      startRecording.disabled = true;
-      stopRecording.disabled = false;
-      deleteRecording.hidden = true;
-
-      recordingTimerId = window.setInterval(() => {
-        const elapsed = Math.floor((Date.now() - recordingStartedAt) / 1000);
-        audioTimer.textContent = formatTimer(elapsed);
-        if (elapsed >= MAX_RECORDING_SECONDS && mediaRecorder?.state === "recording") {
-          mediaRecorder.stop();
-        }
-      }, 250);
-    } catch (error) {
-      console.warn(error);
-      resetAudioDraft();
-      alert("Le microphone n’a pas pu être utilisé. Vérifiez l’autorisation du navigateur.");
-    }
-  }
-
-  function stopAudioRecording() {
-    if (mediaRecorder?.state === "recording") mediaRecorder.stop();
-  }
-
   function renderSaved() {
     const places = readPlaces();
     savedCount.textContent = `${places.length} adresse${places.length === 1 ? "" : "s"}`;
@@ -444,43 +268,11 @@
             ${attributes.length ? `<small>${attributes.map(escapeHtml).join(" · ")}</small>` : ""}
           </div>
           <div class="saved-card-actions">
-            ${place.audioId ? `<button class="play-note" type="button" data-play-audio="${escapeHtml(place.audioId)}">▶ Audio</button>` : ""}
             <button type="button" data-delete="${escapeHtml(place.id)}">Supprimer</button>
           </div>
         </div>
       `;
     }).join("") : "<small>Aucune fiche ajoutée pour le moment.</small>";
-  }
-
-  async function playStoredAudio(button, audioId) {
-    try {
-      const blob = await getAudio(audioId);
-      if (!blob) {
-        alert("La note audio n’est plus disponible sur ce téléphone.");
-        return;
-      }
-
-      const existing = button.parentElement.querySelector("audio");
-      if (existing) {
-        existing.remove();
-        button.textContent = "▶ Audio";
-        return;
-      }
-
-      const player = document.createElement("audio");
-      player.controls = true;
-      player.autoplay = true;
-      player.src = URL.createObjectURL(blob);
-      player.addEventListener("ended", () => {
-        URL.revokeObjectURL(player.src);
-      }, { once: true });
-
-      button.parentElement.appendChild(player);
-      button.textContent = "Masquer";
-    } catch (error) {
-      console.warn(error);
-      alert("Impossible de lire cette note audio.");
-    }
   }
 
   photos.addEventListener("change", () => {
@@ -495,105 +287,383 @@
     });
   });
 
-  toggleRecorder.addEventListener("click", () => {
-    const willOpen = recorderPanel.hidden;
-    recorderPanel.hidden = !willOpen;
-    toggleRecorder.setAttribute("aria-expanded", String(willOpen));
-    toggleRecorder.classList.toggle("active", willOpen);
-  });
+  // ---------- Parler et résumer ----------
 
-  startRecording.addEventListener("click", startAudioRecording);
-  stopRecording.addEventListener("click", stopAudioRecording);
-  deleteRecording.addEventListener("click", resetAudioDraft);
-
-  function setupSpeechRecognition() {
-    const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!Recognition) return null;
-
-    const recognition = new Recognition();
-    recognition.lang = "fr-FR";
-    recognition.continuous = false;
-    recognition.interimResults = true;
-
-    let finalTranscript = "";
-
-    recognition.addEventListener("start", () => {
-      finalTranscript = "";
-      speechStatus.hidden = false;
-      speechStatus.classList.add("listening");
-      speechStatus.textContent = "Écoute en cours… Parlez naturellement.";
-      speechButton.classList.add("active");
-      speechButton.disabled = true;
-    });
-
-    recognition.addEventListener("result", event => {
-      let interimTranscript = "";
-      for (let index = event.resultIndex; index < event.results.length; index += 1) {
-        const transcript = event.results[index][0].transcript;
-        if (event.results[index].isFinal) finalTranscript += `${transcript} `;
-        else interimTranscript += transcript;
-      }
-
-      speechStatus.textContent = interimTranscript
-        ? `Écoute : ${interimTranscript}`
-        : "Transcription reçue…";
-    });
-
-    recognition.addEventListener("end", () => {
-      speechStatus.classList.remove("listening");
-      speechButton.classList.remove("active");
-      speechButton.disabled = false;
-
-      const cleanTranscript = finalTranscript.trim();
-      if (cleanTranscript) {
-        const prefix = description.value.trim();
-        description.value = prefix
-          ? `${prefix}${/[.!?]$/.test(prefix) ? " " : ". "}${cleanTranscript}`
-          : cleanTranscript;
-        description.dispatchEvent(new Event("input", { bubbles: true }));
-        speechStatus.textContent = "Texte ajouté. Relisez-le avant d’enregistrer la fiche.";
-      } else {
-        speechStatus.textContent = "Aucun texte reconnu. Vous pouvez réessayer.";
-      }
-    });
-
-    recognition.addEventListener("error", event => {
-      console.warn(event.error);
-      speechStatus.hidden = false;
-      speechStatus.classList.remove("listening");
-      speechButton.classList.remove("active");
-      speechButton.disabled = false;
-      speechStatus.textContent =
-        event.error === "not-allowed"
-          ? "Le microphone n’est pas autorisé pour la dictée."
-          : "La dictée n’a pas fonctionné sur ce navigateur.";
-    });
-
-    return recognition;
+  function readTalkAdminKey() {
+    return String(talkAdminKey?.value || "").trim();
   }
 
-  speechButton.addEventListener("click", () => {
-    if (!speechRecognition) speechRecognition = setupSpeechRecognition();
+  function restoreTalkAdminKey() {
+    try {
+      talkAdminKey.value = sessionStorage.getItem(TALK_KEY_SESSION) || "";
+    } catch {
+      talkAdminKey.value = "";
+    }
+  }
 
-    if (!speechRecognition) {
-      speechStatus.hidden = false;
-      speechStatus.textContent =
-        "La dictée vocale n’est pas disponible ici. La note audio locale reste utilisable.";
+  function rememberTalkAdminKey() {
+    try {
+      const value = readTalkAdminKey();
+      if (value) sessionStorage.setItem(TALK_KEY_SESSION, value);
+      else sessionStorage.removeItem(TALK_KEY_SESSION);
+    } catch {
+      // Le navigateur peut bloquer le stockage de session ; l'appel reste possible.
+    }
+  }
+
+  function clearTalkAdminKey() {
+    talkAdminKey.value = "";
+    try { sessionStorage.removeItem(TALK_KEY_SESSION); } catch {}
+  }
+
+  function formatTalkTimer(seconds) {
+    const safeSeconds = Math.max(0, Math.min(MAX_TALK_SECONDS, seconds));
+    const minutes = Math.floor(safeSeconds / 60);
+    const remaining = safeSeconds % 60;
+    return `${String(minutes).padStart(2, "0")}:${String(remaining).padStart(2, "0")}`;
+  }
+
+  function preferredAudioMimeType() {
+    if (!window.MediaRecorder) return "";
+    const candidates = ["audio/webm;codecs=opus", "audio/webm", "audio/ogg;codecs=opus", "audio/mp4"];
+    return candidates.find(type => MediaRecorder.isTypeSupported?.(type)) || "";
+  }
+
+  function stopTalkMediaTracks() {
+    talkMediaStream?.getTracks().forEach(track => track.stop());
+    talkMediaStream = null;
+  }
+
+  function clearTalkTimer() {
+    if (talkTimerId) clearInterval(talkTimerId);
+    talkTimerId = null;
+  }
+
+  function setTalkState(nextState, message) {
+    talkPanel.dataset.state = nextState;
+    talkDot.classList.toggle("active", nextState === "recording");
+
+    const labels = {
+      ready: "Prêt à enregistrer",
+      recording: "Enregistrement en cours",
+      transcribing: "Transcription en cours…",
+      summarizing: "Rédaction du résumé…",
+      result: "Résultat prêt",
+      error: "Une erreur est survenue"
+    };
+    talkStatusText.textContent = message || labels[nextState] || "";
+
+    talkStartBtn.hidden = nextState !== "ready" && nextState !== "error";
+    talkStopBtn.hidden = nextState !== "recording";
+    talkCancelBtn.hidden = !["recording", "transcribing", "summarizing"].includes(nextState);
+    talkErrorBox.hidden = nextState !== "error";
+    talkPreview.hidden = nextState !== "result";
+
+    if (nextState === "error" && message) talkErrorBox.textContent = message;
+  }
+
+  function resetTalkCapture() {
+    clearTalkTimer();
+    stopTalkMediaTracks();
+    talkChunks = [];
+    talkMediaRecorder = null;
+    talkTimer.textContent = "00:00";
+  }
+
+  function resetTalkFlow() {
+    resetTalkCapture();
+    talkSelected = { activities: new Set(), cuisines: new Set(), keywords: new Set() };
+    talkResumeText.value = "";
+    talkSuggestChips.innerHTML = "";
+    talkResultNotice.hidden = true;
+    talkResultNotice.textContent = "";
+    setTalkState("ready");
+  }
+
+  async function startTalkRecording() {
+    if (!readTalkAdminKey()) {
+      talkPanel.hidden = false;
+      setTalkState("error", "Saisissez d’abord votre code privé IA.");
+      talkAdminKey.focus();
       return;
     }
 
+    if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
+      setTalkState("error", "L’enregistrement n’est pas pris en charge par ce navigateur.");
+      return;
+    }
+
+    talkCancelled = false;
+    talkAbortController?.abort();
+    talkAbortController = null;
+
     try {
-      speechRecognition.start();
+      talkMediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mimeType = preferredAudioMimeType();
+      const recorder = mimeType
+        ? new MediaRecorder(talkMediaStream, { mimeType })
+        : new MediaRecorder(talkMediaStream);
+      talkMediaRecorder = recorder;
+
+      talkChunks = [];
+      recorder.addEventListener("dataavailable", event => {
+        if (event.data?.size) talkChunks.push(event.data);
+      });
+
+      recorder.addEventListener("stop", () => {
+        clearTalkTimer();
+        stopTalkMediaTracks();
+
+        if (talkCancelled) {
+          talkChunks = [];
+          talkMediaRecorder = null;
+          talkCancelled = false;
+          setTalkState("ready");
+          return;
+        }
+
+        if (!talkChunks.length) {
+          talkMediaRecorder = null;
+          setTalkState("error", "Aucun son enregistré. Réessayez.");
+          return;
+        }
+
+        const blob = new Blob(talkChunks, {
+          type: recorder.mimeType || talkChunks[0].type || "audio/webm"
+        });
+        talkChunks = [];
+        talkMediaRecorder = null;
+        sendTalkAudio(blob);
+      });
+
+      recorder.start(500);
+      talkStartedAt = Date.now();
+      talkPanel.hidden = false;
+      setTalkState("recording");
+
+      talkTimerId = window.setInterval(() => {
+        const elapsed = Math.floor((Date.now() - talkStartedAt) / 1000);
+        talkTimer.textContent = formatTalkTimer(elapsed);
+        if (elapsed >= MAX_TALK_SECONDS && recorder.state === "recording") {
+          setTalkState("transcribing");
+          recorder.stop();
+        }
+      }, 250);
     } catch (error) {
       console.warn(error);
+      resetTalkCapture();
+      const deniedPermission = error?.name === "NotAllowedError" || error?.name === "SecurityError";
+      setTalkState(
+        "error",
+        deniedPermission
+          ? "Le microphone a été refusé. Autorisez-le dans les réglages du navigateur pour réessayer."
+          : "Le microphone n’a pas pu être utilisé sur cet appareil."
+      );
     }
+  }
+
+  function stopTalkRecordingAndProcess() {
+    if (talkMediaRecorder?.state === "recording") {
+      setTalkState("transcribing");
+      talkMediaRecorder.stop();
+    }
+  }
+
+  async function sendTalkAudio(blob) {
+    const adminKey = readTalkAdminKey();
+    if (!adminKey) {
+      setTalkState("error", "Saisissez votre code privé IA, puis recommencez.");
+      talkAdminKey.focus();
+      return;
+    }
+
+    rememberTalkAdminKey();
+    setTalkState("transcribing");
+    const summarizingTimer = window.setTimeout(() => setTalkState("summarizing"), 1800);
+
+    const controller = new AbortController();
+    talkAbortController = controller;
+    const abortTimer = window.setTimeout(() => controller.abort(), TALK_REQUEST_TIMEOUT_MS);
+
+    try {
+      const response = await fetch(TALK_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": blob.type || "audio/webm",
+          "x-admin-key": adminKey
+        },
+        body: blob,
+        signal: controller.signal
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          clearTalkAdminKey();
+          talkAdminKey.focus();
+        }
+        const messages = {
+          401: "Code privé IA incorrect. Vérifiez-le puis réessayez.",
+          403: "Cet appel IA n’est pas autorisé depuis cette page.",
+          413: "L’enregistrement est trop volumineux. Essayez une note plus courte.",
+          415: "Format audio non pris en charge par cet appareil.",
+          429: "Trop de demandes IA en ce moment. Réessayez dans une minute.",
+          502: "Le service de transcription est momentanément indisponible.",
+          504: "Le service IA met trop de temps à répondre. Réessayez."
+        };
+        setTalkState("error", messages[response.status] || "La reformulation a échoué. Vous pouvez réessayer.");
+        return;
+      }
+
+      let payload;
+      try {
+        payload = await response.json();
+      } catch {
+        setTalkState("error", "Le service IA a renvoyé une réponse illisible. Réessayez.");
+        return;
+      }
+
+      if (payload.warning === "empty_transcription") {
+        setTalkState("error", "Aucune parole détectée. Réessayez en parlant plus près du micro.");
+        return;
+      }
+
+      renderTalkResult(payload);
+    } catch (error) {
+      console.warn(error);
+      if (talkCancelled) return;
+      setTalkState(
+        "error",
+        error?.name === "AbortError"
+          ? "Le service IA met trop de temps à répondre. Réessayez."
+          : "Connexion impossible au service IA. Vérifiez votre réseau et réessayez."
+      );
+    } finally {
+      window.clearTimeout(summarizingTimer);
+      window.clearTimeout(abortTimer);
+      if (talkAbortController === controller) talkAbortController = null;
+      talkCancelled = false;
+    }
+  }
+
+  function talkChip(type, value, alreadySelected) {
+    const chip = document.createElement("button");
+    chip.type = "button";
+    chip.className = "talk-chip";
+    chip.textContent = value;
+    chip.setAttribute("aria-pressed", String(alreadySelected));
+    chip.classList.toggle("active", alreadySelected);
+    chip.addEventListener("click", () => {
+      const set = talkSelected[type];
+      if (set.has(value)) set.delete(value);
+      else set.add(value);
+      chip.classList.toggle("active", set.has(value));
+      chip.setAttribute("aria-pressed", String(set.has(value)));
+    });
+    return chip;
+  }
+
+  function renderTalkResult(payload) {
+    if (!payload || typeof payload !== "object") {
+      setTalkState("error", "Le résultat IA est invalide. Réessayez.");
+      return;
+    }
+
+    talkResumeText.value = String(payload.resume || payload.transcription || "").trim();
+    const warningMessages = {
+      summary_failed: "La transcription a été récupérée, mais le résumé automatique est indisponible. Relisez le texte avant de l’insérer.",
+      summary_timeout: "La transcription a été récupérée, mais le résumé a dépassé le délai. Relisez le texte avant de l’insérer.",
+      summary_invalid: "La transcription a été récupérée, mais la réponse de résumé était invalide. Relisez le texte avant de l’insérer."
+    };
+    const warningMessage = warningMessages[payload.warning] || "";
+    talkResultNotice.hidden = !warningMessage;
+    talkResultNotice.textContent = warningMessage;
+
+    talkSelected = { activities: new Set(), cuisines: new Set(), keywords: new Set() };
+    talkSuggestChips.innerHTML = "";
+
+    const groups = [
+      ["activities", "Activités suggérées", payload.activities],
+      ["cuisines", "Cuisines suggérées", payload.cuisines],
+      ["keywords", "Mots-clés suggérés", payload.keywords]
+    ];
+
+    groups.forEach(([type, label, values]) => {
+      if (!Array.isArray(values) || !values.length) return;
+      const group = document.createElement("div");
+      group.className = "talk-chip-group";
+      const heading = document.createElement("small");
+      heading.textContent = label;
+      group.appendChild(heading);
+      const row = document.createElement("div");
+      row.className = "talk-chip-row";
+      values.forEach(value => row.appendChild(talkChip(type, value, false)));
+      group.appendChild(row);
+      talkSuggestChips.appendChild(group);
+    });
+
+    setTalkState("result", warningMessage ? "Transcription prête — résumé à relire" : "Résultat prêt");
+  }
+
+  function applyTalkSuggestionsToForm() {
+    if (talkSelected.activities.size) {
+      setSelectedValues("services", uniqueValues([...selectedValues("services"), ...talkSelected.activities]));
+    }
+    if (talkSelected.cuisines.size) {
+      setSelectedValues("cuisines", uniqueValues([...selectedValues("cuisines"), ...talkSelected.cuisines]));
+    }
+    if (talkSelected.keywords.size) {
+      const existingTags = form.tags.value.split(",").map(v => v.trim()).filter(Boolean);
+      form.tags.value = uniqueValues([...existingTags, ...talkSelected.keywords]).join(", ");
+    }
+  }
+
+  restoreTalkAdminKey();
+  talkAdminKey.addEventListener("input", rememberTalkAdminKey);
+
+  talkButton.addEventListener("click", () => {
+    talkPanel.hidden = false;
+    talkPanel.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (!talkPanel.dataset.state || talkPanel.dataset.state === "ready") setTalkState("ready");
   });
+
+  talkStartBtn.addEventListener("click", startTalkRecording);
+  talkStopBtn.addEventListener("click", stopTalkRecordingAndProcess);
+
+  talkCancelBtn.addEventListener("click", () => {
+    talkCancelled = true;
+    talkAbortController?.abort();
+    talkAbortController = null;
+    if (talkMediaRecorder?.state === "recording") {
+      talkMediaRecorder.stop();
+      return;
+    }
+    resetTalkFlow();
+    talkCancelled = false;
+  });
+
+  talkInsertBtn.addEventListener("click", () => {
+    const cleanResume = talkResumeText.value.trim();
+    if (cleanResume) {
+      const prefix = description.value.trim();
+      description.value = prefix
+        ? `${prefix}${/[.!?]$/.test(prefix) ? " " : ". "}${cleanResume}`
+        : cleanResume;
+      description.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+    applyTalkSuggestionsToForm();
+    saveDraft();
+    talkPanel.hidden = true;
+    resetTalkFlow();
+  });
+
+  talkRestartBtn.addEventListener("click", resetTalkFlow);
 
   form.addEventListener("submit", async event => {
     event.preventDefault();
 
-    if (mediaRecorder?.state === "recording") {
-      alert("Arrêtez d’abord l’enregistrement audio.");
+    if (talkMediaRecorder?.state === "recording") {
+      setTalkState("error", "Arrêtez d’abord l’enregistrement en cours.");
+      talkPanel.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
 
@@ -604,23 +674,11 @@
     const data = new FormData(form);
     const placeId = `local-${Date.now()}`;
     let photo = "";
-    let audioId = "";
 
     try {
       photo = await compressPhoto(photos.files?.[0]);
     } catch (error) {
       console.warn(error);
-    }
-
-    if (recordedAudioBlob) {
-      try {
-        audioId = `audio-${placeId}`;
-        await putAudio(audioId, recordedAudioBlob);
-      } catch (error) {
-        console.warn(error);
-        audioId = "";
-        alert("La fiche sera enregistrée, mais la note audio n’a pas pu être conservée.");
-      }
     }
 
     const services = uniqueValues(selectedValues("services"));
@@ -655,7 +713,6 @@
       },
       colors: categoryColors[category] || ["#0E2233", "#159D99"],
       photo,
-      audioId,
       createdAt: new Date().toISOString()
     };
 
@@ -666,18 +723,14 @@
       renderSaved();
       form.reset();
       preview.innerHTML = "";
-      resetAudioDraft();
-      recorderPanel.hidden = true;
-      toggleRecorder.classList.remove("active");
-      toggleRecorder.setAttribute("aria-expanded", "false");
-      speechStatus.hidden = true;
+      talkPanel.hidden = true;
+      resetTalkFlow();
       saveError.hidden = true;
       clearDraft();
       goToStep(1);
       successDialog.showModal();
     } catch (error) {
       console.warn(error);
-      if (audioId) await removeAudio(audioId).catch(() => {});
       saveError.hidden = false;
     } finally {
       submitButton.disabled = false;
@@ -685,23 +738,15 @@
     }
   });
 
-  savedPlaces.addEventListener("click", async event => {
-    const playButton = event.target.closest("[data-play-audio]");
-    if (playButton) {
-      await playStoredAudio(playButton, playButton.dataset.playAudio);
-      return;
-    }
-
+  savedPlaces.addEventListener("click", event => {
     const deleteButton = event.target.closest("[data-delete]");
     if (!deleteButton) return;
 
     const places = readPlaces();
-    const place = places.find(item => item.id === deleteButton.dataset.delete);
     const nextPlaces = places.filter(item => item.id !== deleteButton.dataset.delete);
 
     try {
       writePlaces(nextPlaces);
-      if (place?.audioId) await removeAudio(place.audioId).catch(() => {});
       renderSaved();
       saveError.hidden = true;
     } catch (error) {
@@ -716,12 +761,11 @@
   });
 
   window.addEventListener("beforeunload", () => {
-    clearRecordingTimer();
-    stopMediaTracks();
-    if (recordedAudioUrl) URL.revokeObjectURL(recordedAudioUrl);
+    clearTalkTimer();
+    stopTalkMediaTracks();
   });
 
-  wizardNextBtn.addEventListener("click", event => {
+  wizardNextBtn.addEventListener("click", () => {
     if (wizardNextBtn.type === "submit") return;
     const invalidField = currentStepInvalidField();
     if (invalidField) {
@@ -750,7 +794,7 @@
   discardDraftBtn.addEventListener("click", () => {
     clearDraft();
     form.reset();
-    resetAudioDraft();
+    resetTalkFlow();
     goToStep(1);
     draftBanner.hidden = true;
   });
@@ -764,6 +808,7 @@
   });
 
   goToStep(1);
+  resetTalkFlow();
   const existingDraft = readDraft();
   if (draftHasContent(existingDraft)) draftBanner.hidden = false;
 
