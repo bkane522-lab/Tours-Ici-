@@ -259,11 +259,11 @@
           <div class="place-tags">
             ${combinedTags(place).slice(0, 2).map(tag => `<span>${escapeHtml(tag)}</span>`).join("")}
           </div>
-          <div class="place-actions">
-            <button class="details-btn" type="button">Voir</button>
-            <a class="route-btn" href="${mapsUrl(place)}" target="_blank" rel="noopener" aria-label="Itinéraire">⌖</a>
-            <button class="share-btn" type="button" aria-label="Partager">↗</button>
-          </div>
+        </div>
+        <div class="place-actions">
+          <button class="details-btn" type="button">Voir</button>
+          <a class="route-btn" href="${mapsUrl(place)}" target="_blank" rel="noopener" aria-label="Itinéraire">⌖</a>
+          <button class="share-btn" type="button" aria-label="Partager">↗</button>
         </div>
       </article>
     `;
@@ -273,13 +273,20 @@
     const places = filteredPlaces();
     els.resultCount.textContent = String(places.length);
     els.resultCountLabel.textContent = places.length === 1 ? "adresse" : "adresses";
-    els.list.innerHTML = places.map(placeCard).join("");
-    els.emptyState.hidden = state.view !== "list" || places.length !== 0;
-    els.list.hidden = state.view !== "list" || places.length === 0;
-    els.mapPanel.hidden = state.view !== "map";
 
-    if (state.view === "map") {
+    const isMapView = state.view === "map";
+
+    if (isMapView) {
+      els.list.hidden = true;
+      els.emptyState.hidden = true;
+      els.mapPanel.hidden = false;
+      els.list.innerHTML = "";
       requestAnimationFrame(() => renderMap(places));
+    } else {
+      els.mapPanel.hidden = true;
+      els.list.innerHTML = places.map(placeCard).join("");
+      els.list.hidden = places.length === 0;
+      els.emptyState.hidden = places.length !== 0;
     }
   }
 
@@ -347,7 +354,9 @@
     if (bounds.length > 1) state.map.fitBounds(bounds, { padding: [35, 35], maxZoom: 15 });
     else if (bounds.length === 1) state.map.setView(bounds[0], 15);
 
-    setTimeout(() => state.map.invalidateSize(), 100);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => state.map.invalidateSize());
+    });
   }
 
   function setView(view) {

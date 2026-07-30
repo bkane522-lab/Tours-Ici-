@@ -17,11 +17,6 @@
       <span>Vous pouvez préparer une fiche même sans être sur place. Elle sera enregistrée uniquement sur l’appareil utilisé.</span>
     </header>
 
-    <section class="consent-note">
-      <strong>Avant les photos</strong>
-      <p>Demandez l’autorisation du responsable. Évitez les clients reconnaissables sans accord.</p>
-    </section>
-
     <section id="draftBanner" class="draft-banner" hidden>
       <p>Une fiche non terminée a été trouvée sur cet appareil.</p>
       <div>
@@ -199,6 +194,11 @@
       </section>
 
       <section class="wizard-step" data-step="4" hidden>
+        <div class="consent-note full">
+          <strong>Avant les photos</strong>
+          <p>Demandez l’autorisation du responsable. Évitez les clients reconnaissables sans accord.</p>
+        </div>
+
         <div class="field full">
           <label for="photos">Photos prises sur place</label>
           <input id="photos" name="photos" type="file" accept="image/*" multiple capture="environment" />
@@ -214,8 +214,9 @@
         </p>
       </section>
 
+      <div class="wizard-nav-clearance full"></div>
       <div class="wizard-nav full">
-        <button id="wizardBackBtn" class="secondary" type="button" disabled>← Retour</button>
+        <button id="wizardBackBtn" class="secondary wizard-back" type="button" disabled hidden>← Retour</button>
         <button id="wizardNextBtn" class="primary" type="button">Suivant →</button>
       </div>
     </form>

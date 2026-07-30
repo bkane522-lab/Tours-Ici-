@@ -266,8 +266,8 @@ main { padding: 6px 16px 24px; }
 .place-card {
   display: grid;
   grid-template-columns: 104px 1fr;
+  grid-template-areas: "media content" "actions actions";
   align-items: start;
-  min-height: 155px;
   overflow: hidden;
   border: 1px solid rgba(23,33,43,.07);
   border-radius: 21px;
@@ -275,10 +275,10 @@ main { padding: 6px 16px 24px; }
   box-shadow: 0 8px 22px rgba(14,34,51,.06);
 }
 .place-cover {
+  grid-area: media;
   position: relative;
   width: 100%;
   aspect-ratio: 1 / 1;
-  align-self: start;
   display: grid;
   place-items: center;
   overflow: hidden;
@@ -323,7 +323,7 @@ main { padding: 6px 16px 24px; }
   font-size: 8px;
   font-weight: 900;
 }
-.place-card-content { padding: 13px 13px 11px; min-width: 0; }
+.place-card-content { grid-area: content; padding: 10px 12px 8px; min-width: 0; }
 .place-topline { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
 .place-category { margin: 0; color: var(--coral); font-size: 9px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
 .favorite-button {
@@ -337,13 +337,13 @@ main { padding: 6px 16px 24px; }
   font-size: 17px;
 }
 .favorite-button.active { color: var(--coral); background: #fff0ed; border-color: #ffd5cd; }
-.place-card h3 { margin: 4px 0 5px; font-size: 17px; line-height: 1.08; }
+.place-card h3 { margin: 3px 0 4px; font-size: 16px; line-height: 1.1; }
 .place-meta { display: flex; flex-wrap: wrap; gap: 5px 8px; color: var(--muted); font-size: 10.5px; }
 .place-meta .open { color: #137a5d; font-weight: 900; }
 .place-meta .closed { color: #a84f4f; font-weight: 900; }
-.place-tags { display: flex; gap: 5px; margin-top: 9px; overflow: hidden; }
+.place-tags { display: flex; gap: 5px; margin-top: 7px; overflow: hidden; }
 .place-tags span { flex: 0 0 auto; padding: 5px 7px; border-radius: 8px; background: #f5f3f0; color: #5e6870; font-size: 9px; font-weight: 800; }
-.place-actions { display: flex; align-items: center; gap: 7px; margin-top: 10px; }
+.place-actions { grid-area: actions; display: flex; align-items: center; gap: 7px; padding: 8px 12px 12px; }
 .place-actions button, .place-actions a {
   border: 0;
   border-radius: 11px;
@@ -566,7 +566,7 @@ main { padding: 6px 16px 24px; }
   .hero { min-height: 230px; }
   .category-grid { gap: 6px; }
   .category-chip { min-height: 50px; }
-  .place-card { grid-template-columns: 100px 1fr; align-items: start; min-height: 155px; }
+  .place-card { grid-template-columns: 100px 1fr; }
   .place-card-content { padding: 10px 12px 9px; }
   .place-actions { gap: 5px; }
   .place-actions button, .place-actions a { padding: 7px; font-size: 9px; }

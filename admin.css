@@ -13,11 +13,11 @@ body{margin:0;background:#ece8e2;color:var(--ink);font-family:Inter,system-ui,-a
 button,input,select,textarea{font:inherit}
 a{color:inherit}
 .admin-shell{width:min(100%,720px);min-height:100vh;margin:auto;padding:0 16px 44px;background:var(--cream)}
-header{margin:0 -16px;padding:24px 20px 35px;border-radius:0 0 34px 34px;color:white;background:linear-gradient(145deg,#0d2030,#1d5360)}
+header{margin:0 -16px;padding:18px 20px 24px;border-radius:0 0 34px 34px;color:white;background:linear-gradient(145deg,#0d2030,#1d5360)}
 header a{font-size:12px;font-weight:800;text-decoration:none;color:#ffd4cb}
-header p,.saved-section>div>p{margin:40px 0 6px;color:#ffd4cb;font-size:10px;font-weight:900;letter-spacing:.18em}
-header h1{margin:0;font-size:34px;line-height:1.05;letter-spacing:-.04em}
-header span{display:block;margin-top:12px;color:rgba(255,255,255,.72);font-size:13px;line-height:1.5}
+header p,.saved-section>div>p{margin:20px 0 6px;color:#ffd4cb;font-size:10px;font-weight:900;letter-spacing:.18em}
+header h1{margin:0;font-size:26px;line-height:1.08;letter-spacing:-.03em}
+header span{display:block;margin-top:8px;color:rgba(255,255,255,.72);font-size:12.5px;line-height:1.45}
 .consent-note{margin:18px 0;padding:16px;border-radius:18px;background:#fff0ed;border:1px solid #ffd7d0}
 .consent-note strong{color:#a33f35}
 .consent-note p{margin:6px 0 0;font-size:12px;line-height:1.45;color:#6f4d49}
@@ -114,13 +114,17 @@ small{color:var(--muted);font-size:10px;line-height:1.35}
 .wizard-step{display:contents}
 .wizard-step[hidden]{display:none}
 
+#placeForm{padding-bottom:14px}
+#placeForm input,#placeForm select,#placeForm textarea{scroll-margin-bottom:104px;scroll-margin-top:16px}
+.wizard-nav-clearance{grid-column:1/-1;height:76px}
+
 /* Navigation sticky Retour/Suivant */
 .wizard-nav{
   position: sticky;
   bottom: max(12px, env(safe-area-inset-bottom));
   display:flex;
   gap:10px;
-  margin-top:6px;
+  margin-top:0;
   padding:10px;
   border-radius:16px;
   background:rgba(255,255,255,.97);
@@ -129,6 +133,7 @@ small{color:var(--muted);font-size:10px;line-height:1.35}
 }
 .wizard-nav button{flex:1;min-height:48px;border:0;border-radius:14px;font-weight:900}
 .wizard-nav button[disabled]{opacity:.4}
+.wizard-nav .wizard-back[hidden]{display:none}
 
 /* Récapitulatif de l'étape 4 */
 .wizard-summary{padding:14px;border-radius:16px;background:#f6f3ee;font-size:12px;line-height:1.6;color:var(--muted)}

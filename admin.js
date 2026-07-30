@@ -186,6 +186,7 @@
   function updateWizardChrome() {
     wizardStepLabel.textContent = `Étape ${currentStep} sur ${TOTAL_STEPS} · ${STEP_TITLES[currentStep - 1]}`;
     wizardDots.forEach((dot, index) => dot.classList.toggle("active", index === currentStep - 1));
+    wizardBackBtn.hidden = currentStep === 1;
     wizardBackBtn.disabled = currentStep === 1;
 
     const isLastStep = currentStep === TOTAL_STEPS;
@@ -752,6 +753,14 @@
     resetAudioDraft();
     goToStep(1);
     draftBanner.hidden = true;
+  });
+
+  form.querySelectorAll("input, select, textarea").forEach(field => {
+    field.addEventListener("focus", () => {
+      window.setTimeout(() => {
+        field.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 300);
+    });
   });
 
   goToStep(1);
